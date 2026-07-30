@@ -180,7 +180,7 @@ const App = {
       checkin: 'Check-in diário',
       history: 'Histórico',
       progress: 'Progresso',
-      guide: 'Guia & orientações',
+      guide: 'Guia Completo',
     };
     const headerTitleEl = document.getElementById('appHeaderTitle');
     if (headerTitleEl) headerTitleEl.textContent = headerTitles[viewName] || '';

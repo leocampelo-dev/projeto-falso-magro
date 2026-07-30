@@ -316,6 +316,148 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
 .hero-stat__label { color: var(--gray-400); }
 .hero-stat__value { font-family: var(--font-mono); font-weight: 500; }
 
+/* ---- Boas-vindas (topo da Home) ---- */
+.welcome-intro__greeting {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-600);
+  margin-bottom: var(--space-2);
+}
+
+.welcome-intro__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.welcome-intro__sub {
+  font-size: 14px;
+  color: var(--gray-600);
+  margin-top: var(--space-3);
+}
+
+.welcome-intro__list {
+  list-style: none;
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.welcome-intro__list li {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
+  padding-left: 22px;
+  position: relative;
+}
+.welcome-intro__list li::before {
+  content: '🔥';
+  position: absolute;
+  left: 0;
+  font-size: 12px;
+}
+
+.welcome-intro__cta {
+  margin-top: var(--space-4);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--orange-dark);
+}
+
+/* ---- Vídeo de boas-vindas ---- */
+.video-card__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+}
+.video-card__sub {
+  font-size: 13px;
+  color: var(--gray-600);
+  margin-top: 4px;
+}
+.video-placeholder {
+  margin-top: var(--space-4);
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-sm);
+  background: var(--gray-100);
+  border: 1.5px dashed var(--gray-200);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  color: var(--gray-400);
+}
+.video-placeholder__icon { font-size: 28px; }
+.video-placeholder__label { font-size: 12px; font-weight: 600; }
+
+/* ---- Step cards (Comece por aqui) ---- */
+.step-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+.step-card + .step-card { margin-top: var(--space-3); }
+
+.step-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.step-card__number {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-card__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15.5px;
+  flex: 1;
+}
+
+.step-card__check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--success);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 700;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.step-card__desc {
+  font-size: 13.5px;
+  color: var(--gray-600);
+  line-height: 1.5;
+  margin: var(--space-3) 0 var(--space-4);
+}
+
+.step-card__hint {
+  text-align: center;
+  font-size: 12px;
+  color: var(--gray-400);
+  margin-top: var(--space-2);
+}
+
 /* ---- Grid de metas / macros ---- */
 .goal-grid {
   display: grid;
@@ -552,8 +694,97 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   font-family: var(--font-mono);
   color: var(--gray-400);
 }
-.day-dot.is-done { background: var(--orange); color: var(--white); }
+.day-dot.is-done { background: var(--orange); color: var(--white); font-size: 11px; }
+.day-dot.is-missed { border: 1.5px solid var(--danger); color: var(--danger); background: var(--white); }
 .day-dot.is-today { box-shadow: 0 0 0 2px var(--orange); background: var(--white); color: var(--orange); font-weight: 700; }
+
+/* ---- Checklist de valor do Guia ---- */
+.guide-features__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15.5px;
+  margin-bottom: var(--space-3);
+}
+.guide-features__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.guide-features__list li {
+  font-size: 14px;
+  color: var(--gray-700);
+  padding-left: 26px;
+  position: relative;
+}
+.guide-features__list li::before {
+  content: '✔';
+  position: absolute;
+  left: 0;
+  color: var(--success);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* ---- Trio de estatísticas (Progresso) ---- */
+.stat-trio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+.stat-trio__item {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-2);
+  text-align: center;
+}
+.stat-trio__value {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--orange);
+}
+.stat-trio__label {
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+/* ---- Legenda do grid de 30 dias ---- */
+.day-grid__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  font-size: 11.5px;
+  color: var(--gray-600);
+}
+.day-grid__legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.legend-dot--done { background: var(--orange); }
+.legend-dot--missed { background: var(--white); border: 1.5px solid var(--danger); }
+.legend-dot--today { background: var(--white); box-shadow: 0 0 0 2px var(--orange); }
+
+/* ---- Card do último check-in (Histórico) ---- */
+.last-checkin-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.last-checkin-card__label { font-size: 13px; color: var(--gray-600); }
+.last-checkin-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--space-4);
+}
 
 /* ============================================================
    HISTÓRICO / LISTAS
@@ -889,53 +1120,60 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
 @media (min-width: 900px) {
   .tab-bar { display: none; }
 
-  .main-layout { max-width: 1120px; margin: 0 auto; width: 100%; }
+  .main-layout { max-width: 1080px; margin: 0 auto; width: 100%; align-items: flex-start; }
 
   .sidebar {
     display: flex;
     flex-direction: column;
-    width: 240px;
+    width: 208px;
     flex-shrink: 0;
-    padding: var(--space-6) var(--space-4);
+    padding: var(--space-5) var(--space-3);
     border-right: 1px solid var(--gray-200);
-    height: 100vh;
+    height: auto;
     position: sticky;
-    top: 0;
+    top: var(--space-5);
   }
 
   .sidebar__brand {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    padding: 0 var(--space-3);
-    margin-bottom: var(--space-7);
+    gap: 10px;
+    padding: 0 var(--space-2);
+    margin-bottom: var(--space-5);
   }
   .sidebar__brand-icon {
-    width: 36px; height: 36px;
-    border-radius: 11px;
+    width: 30px; height: 30px;
+    border-radius: 9px;
     background: linear-gradient(155deg, var(--orange), var(--orange-dark));
     display: flex; align-items: center; justify-content: center;
-    font-size: 17px;
+    font-size: 14px;
   }
-  .sidebar__brand-text { font-family: var(--font-display); font-weight: 700; font-size: 15px; }
+  .sidebar__brand-text { font-family: var(--font-display); font-weight: 700; font-size: 14px; }
 
   .sidebar .tab-btn {
     flex-direction: row;
     justify-content: flex-start;
     height: auto;
-    padding: 12px var(--space-3);
-    border-radius: var(--radius-sm);
-    gap: var(--space-3);
-    font-size: 14px;
-    margin-bottom: 2px;
+    padding: 9px var(--space-2);
+    border-radius: 10px;
+    gap: 10px;
+    font-size: 13.5px;
+    margin-bottom: 1px;
   }
+  .sidebar .tab-btn__icon { width: 18px; height: 18px; font-size: 15px; }
   .sidebar .tab-btn.is-active { background: var(--orange-light); }
   .sidebar .tab-btn.is-active .tab-btn__icon { transform: none; }
 
-  .content { max-width: 620px; padding: var(--space-7) var(--space-6) var(--space-7); margin: 0; }
+  .content { max-width: 600px; padding: var(--space-6) var(--space-5) var(--space-6); margin: 0; }
   .app-header { display: none; }
 
   .toast-stack { top: 24px; }
+
+  /* Evitar cards/botões exagerados no desktop */
+  .card { padding: var(--space-4) var(--space-5); }
+  .hero-card { padding: var(--space-5); }
+  .step-card { padding: var(--space-4); }
+  .btn { padding: 13px 20px; }
 }
 
 @media (min-width: 900px) and (max-width: 1119px) {

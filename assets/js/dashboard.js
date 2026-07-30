@@ -18,6 +18,7 @@ const Dashboard = {
     this._renderRing(displayDay, isComplete);
     this._renderGoals();
     this._renderQuickStats(user);
+    this._renderStepChecks();
 
     if (isComplete && !user.completionShown) {
       user.completionShown = true;
@@ -62,6 +63,18 @@ const Dashboard = {
     if (lastWeightEl) {
       const last = Storage.getLastCheckin();
       lastWeightEl.textContent = last ? `${last.weight} kg` : '—';
+    }
+  },
+
+  _renderStepChecks() {
+    const goalsCheck = document.getElementById('stepCheckGoals');
+    if (goalsCheck) goalsCheck.style.display = Storage.hasGoals() ? 'flex' : 'none';
+
+    const todayCheck = document.getElementById('stepCheckToday');
+    if (todayCheck) {
+      const todayKey = Utils.getDateKey(new Date());
+      const hasToday = !!Storage.getCheckinByDateKey(todayKey);
+      todayCheck.style.display = hasToday ? 'flex' : 'none';
     }
   },
 

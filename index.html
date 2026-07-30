@@ -123,13 +123,13 @@
           <span class="tab-btn__icon">✅</span><span>Check-in</span>
         </button>
         <button class="tab-btn" data-nav-target="history">
-          <span class="tab-btn__icon">📋</span><span>Histórico</span>
+          <span class="tab-btn__icon">📈</span><span>Histórico</span>
         </button>
         <button class="tab-btn" data-nav-target="progress">
-          <span class="tab-btn__icon">📈</span><span>Progresso</span>
+          <span class="tab-btn__icon">🔥</span><span>Progresso</span>
         </button>
         <button class="tab-btn" data-nav-target="guide">
-          <span class="tab-btn__icon">📘</span><span>Guia</span>
+          <span class="tab-btn__icon">📘</span><span>Guia Completo</span>
         </button>
       </nav>
 
@@ -146,9 +146,76 @@
           <!-- ==================== VIEW: DASHBOARD ==================== -->
           <div id="view-dashboard" class="view is-active">
 
+            <!-- Bem-vindo: responde "o que é isto?" em segundos -->
+            <div class="card welcome-intro">
+              <span class="welcome-intro__greeting" id="dashGreeting">Olá 👋</span>
+              <h1 class="welcome-intro__title">Bem-vindo ao Projeto Falso Magro 30 Dias</h1>
+              <p class="welcome-intro__sub">Durante os próximos 30 dias você terá um único objetivo:</p>
+              <ul class="welcome-intro__list">
+                <li>Reduzir gordura corporal</li>
+                <li>Ganhar massa muscular</li>
+                <li>Criar consistência</li>
+              </ul>
+              <p class="welcome-intro__cta">👇 Siga estes quatro passos para começar.</p>
+            </div>
+
+            <!-- Vídeo de boas-vindas -->
+            <div class="card video-card">
+              <div class="video-card__title">Assista antes de começar</div>
+              <p class="video-card__sub">Este vídeo explica em menos de dois minutos como utilizar todo o sistema.</p>
+              <div class="video-placeholder">
+                <span class="video-placeholder__icon">▶️</span>
+                <span class="video-placeholder__label">Vídeo em breve</span>
+              </div>
+            </div>
+
+            <!-- Comece por aqui: os 4 passos -->
+            <h2 class="section-title">Comece por aqui</h2>
+
+            <div class="step-card">
+              <div class="step-card__head">
+                <span class="step-card__number">1</span>
+                <div class="step-card__title">Calcule suas metas</div>
+                <span class="step-card__check" id="stepCheckGoals" style="display:none;">✓</span>
+              </div>
+              <p class="step-card__desc">Informe idade, peso e altura para descobrir quantas calorias e quantos macronutrientes consumir diariamente.</p>
+              <button class="btn btn--primary" data-action="open-calculator">Calcular minhas metas</button>
+              <p class="step-card__hint">Leva menos de dois minutos.</p>
+            </div>
+
+            <div class="step-card">
+              <div class="step-card__head">
+                <span class="step-card__number">2</span>
+                <div class="step-card__title">Monte sua alimentação</div>
+              </div>
+              <p class="step-card__desc">Abra o Guia Completo e escolha alimentos equivalentes para montar sua dieta de forma simples.</p>
+              <button class="btn btn--secondary" data-nav-target="guide">Abrir Guia Completo</button>
+            </div>
+
+            <div class="step-card">
+              <div class="step-card__head">
+                <span class="step-card__number">3</span>
+                <div class="step-card__title">Escolha seu treino</div>
+              </div>
+              <p class="step-card__desc">Dentro do Guia você encontrará sugestões de treinos para diferentes níveis.</p>
+              <button class="btn btn--secondary" data-nav-target="guide">Ver Treinos</button>
+            </div>
+
+            <div class="step-card">
+              <div class="step-card__head">
+                <span class="step-card__number">4</span>
+                <div class="step-card__title">Faça seu check-in diário</div>
+                <span class="step-card__check" id="stepCheckToday" style="display:none;">✓</span>
+              </div>
+              <p class="step-card__desc">Registre diariamente seu peso, água, treino, alimentação e energia para acompanhar sua evolução.</p>
+              <button class="btn btn--primary" data-nav-target="checkin">Fazer Check-in</button>
+            </div>
+
+            <!-- Só depois dos 4 passos: progresso, metas e estatísticas -->
+            <h2 class="section-title">Seu progresso</h2>
+
             <div class="card card--dark hero-card">
               <span class="hero-card__eyebrow">🔥 Projeto Falso Magro · 30 Dias</span>
-              <h1 class="hero-card__greeting" id="dashGreeting">Olá 👋</h1>
               <p class="hero-card__sub" id="dashDayLabel">Dia 1 de 30</p>
 
               <div class="hero-card__ring-row">
@@ -169,7 +236,7 @@
               </div>
             </div>
 
-            <h2 class="section-title">Seu objetivo diário</h2>
+            <h2 class="section-title">Suas metas diárias</h2>
 
             <div id="dashGoalsEmpty" class="card empty-state">
               <div class="empty-state__icon">🧮</div>
@@ -212,14 +279,6 @@
               <button class="btn btn--secondary" data-action="open-calculator">Recalcular metas</button>
             </div>
 
-            <h2 class="section-title">Check-in de hoje</h2>
-            <div class="card">
-              <p style="font-size:14px; color:var(--gray-600); margin-bottom:16px;">
-                Registre seu peso, água, treino e alimentação de hoje em menos de 1 minuto.
-              </p>
-              <button class="btn btn--primary" data-nav-target="checkin">Fazer check-in de hoje</button>
-            </div>
-
           </div>
 
           <!-- ==================== VIEW: CHECK-IN ==================== -->
@@ -228,18 +287,18 @@
 
             <div class="card">
               <div class="field">
-                <label class="field__label" for="checkinWeight">Peso de hoje (kg)</label>
+                <label class="field__label" for="checkinWeight">⚖️ Peso de hoje (kg)</label>
                 <input id="checkinWeight" class="input" type="number" step="0.1" min="0" placeholder="Ex: 78.4" inputmode="decimal" />
               </div>
 
               <div class="field">
-                <label class="field__label" for="checkinWater">Água ingerida (ml)</label>
+                <label class="field__label" for="checkinWater">💧 Água ingerida (ml)</label>
                 <input id="checkinWater" class="input" type="number" step="50" min="0" placeholder="Ex: 2500" inputmode="numeric" />
                 <p class="field__hint">Se preferir, some copos e garrafas do dia em mililitros.</p>
               </div>
 
               <div class="field">
-                <label class="field__label">Treinou hoje?</label>
+                <label class="field__label">💪 Treinou hoje?</label>
                 <div class="toggle-row" id="trainedRow" data-toggle-group="trained">
                   <button type="button" class="toggle-btn" data-value="sim">Sim</button>
                   <button type="button" class="toggle-btn" data-value="nao">Não</button>
@@ -247,7 +306,7 @@
               </div>
 
               <div class="field">
-                <label class="field__label">Dormiu bem?</label>
+                <label class="field__label">😴 Dormiu bem?</label>
                 <div class="toggle-row" id="sleptWellRow" data-toggle-group="sleptWell">
                   <button type="button" class="toggle-btn" data-value="sim">Sim</button>
                   <button type="button" class="toggle-btn" data-value="nao">Não</button>
@@ -255,7 +314,7 @@
               </div>
 
               <div class="field">
-                <label class="field__label">Nível de energia (1 a 10)</label>
+                <label class="field__label">⚡ Nível de energia (1 a 10)</label>
                 <div class="scale-row" id="energyScale">
                   <button type="button" class="scale-dot" data-value="1">1</button>
                   <button type="button" class="scale-dot" data-value="2">2</button>
@@ -271,7 +330,7 @@
               </div>
 
               <div class="field">
-                <label class="field__label">Como foi sua alimentação hoje?</label>
+                <label class="field__label">🍽️ Como foi sua alimentação hoje?</label>
                 <div class="option-group" id="nutritionOptions">
                   <button type="button" class="option-chip" data-value="excelente">Excelente</button>
                   <button type="button" class="option-chip" data-value="boa">Boa</button>
@@ -281,7 +340,7 @@
               </div>
 
               <div class="field" style="margin-bottom:0;">
-                <label class="field__label" for="checkinNotes">Observações (opcional)</label>
+                <label class="field__label" for="checkinNotes">📝 Observações (opcional)</label>
                 <textarea id="checkinNotes" class="textarea" placeholder="Como você se sentiu hoje?"></textarea>
               </div>
             </div>
@@ -293,23 +352,32 @@
 
           <!-- ==================== VIEW: HISTÓRICO ==================== -->
           <div id="view-history" class="view">
-            <h2 class="section-title" style="margin-top:0;">Seu histórico</h2>
+            <h2 class="section-title" style="margin-top:0;">Último check-in</h2>
 
-            <div id="historyLastWeight" class="card" style="display:none; align-items:center; justify-content:space-between; flex-direction:row;">
-              <div>
-                <div style="font-size:13px; color:var(--gray-600);">Último peso registrado</div>
-                <div id="historyLastWeightValue" class="goal-card__value" style="margin-top:4px;">—</div>
+            <div id="historyLastWeight" class="card last-checkin-card" style="display:none;">
+              <div class="last-checkin-card__head">
+                <div>
+                  <div class="last-checkin-card__label">Peso registrado</div>
+                  <div id="historyLastWeightValue" class="goal-card__value">—</div>
+                </div>
+                <div id="historyLastWeightDate" class="history-item__tag">—</div>
               </div>
-              <div id="historyLastWeightDate" class="history-item__tag">—</div>
+              <div class="last-checkin-card__tags" id="historyLastCheckinTags"></div>
             </div>
 
-            <div class="card" style="margin-top:16px;">
-              <div id="historyList"></div>
-              <div id="historyEmpty" class="empty-state" style="display:none;">
-                <div class="empty-state__icon">📋</div>
-                <div class="empty-state__title">Nenhum check-in ainda</div>
-                <div class="empty-state__sub">Seus registros diários vão aparecer aqui assim que você começar.</div>
+            <div id="historyEmpty" class="card empty-state">
+              <div class="empty-state__icon">📋</div>
+              <div class="empty-state__title">Nenhum check-in ainda</div>
+              <div class="empty-state__sub">Seus registros diários vão aparecer aqui assim que você começar.</div>
+              <div style="margin-top:20px;">
+                <button class="btn btn--primary" data-nav-target="checkin">Fazer meu primeiro check-in</button>
               </div>
+            </div>
+
+            <h2 class="section-title" id="historyListTitle" style="display:none;">Histórico completo</h2>
+
+            <div id="historyListCard" class="card" style="display:none;">
+              <div id="historyList"></div>
             </div>
           </div>
 
@@ -317,7 +385,22 @@
           <div id="view-progress" class="view">
             <h2 class="section-title" style="margin-top:0;">Seu progresso</h2>
 
-            <div class="card">
+            <div class="stat-trio">
+              <div class="stat-trio__item">
+                <div class="stat-trio__value" id="progressStreak">0</div>
+                <div class="stat-trio__label">Dias seguidos</div>
+              </div>
+              <div class="stat-trio__item">
+                <div class="stat-trio__value" id="progressTotal">0</div>
+                <div class="stat-trio__label">Check-ins</div>
+              </div>
+              <div class="stat-trio__item">
+                <div class="stat-trio__value" id="progressPercent">0%</div>
+                <div class="stat-trio__label">Concluído</div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top:16px;">
               <div class="progress-track">
                 <div id="progressFill" class="progress-fill" style="width:0%;"></div>
               </div>
@@ -327,17 +410,36 @@
               </div>
 
               <div id="progressGrid" class="day-grid"></div>
+
+              <div class="day-grid__legend">
+                <span><i class="legend-dot legend-dot--done"></i> Concluído</span>
+                <span><i class="legend-dot legend-dot--missed"></i> Não registrado</span>
+                <span><i class="legend-dot legend-dot--today"></i> Hoje</span>
+              </div>
             </div>
           </div>
 
           <!-- ==================== VIEW: GUIA & ORIENTAÇÕES ==================== -->
           <div id="view-guide" class="view">
-            <h2 class="section-title" style="margin-top:0;">Guia completo</h2>
+            <h2 class="section-title" style="margin-top:0;">Guia Completo</h2>
 
-            <div class="card" style="display:flex; align-items:center; justify-content:space-between; flex-direction:row; gap:16px;">
+            <div class="card guide-features">
+              <div class="guide-features__title">No Guia Completo você encontrará:</div>
+              <ul class="guide-features__list">
+                <li>Como montar sua alimentação</li>
+                <li>Como escolher proteínas</li>
+                <li>Como escolher carboidratos</li>
+                <li>Como distribuir refeições</li>
+                <li>Exemplos de dieta</li>
+                <li>Exemplos de treino</li>
+                <li>Dicas para acelerar resultados</li>
+              </ul>
+            </div>
+
+            <div class="card" style="display:flex; align-items:center; justify-content:space-between; flex-direction:row; gap:16px; margin-top:16px;">
               <div>
                 <div style="font-weight:700; font-family:var(--font-display);">Guia Completo — PDF</div>
-                <div style="font-size:13px; color:var(--gray-600); margin-top:4px;">Todo o passo a passo do desafio</div>
+                <div style="font-size:13px; color:var(--gray-600); margin-top:4px;">Abra e mantenha por perto durante os 30 dias</div>
               </div>
               <button class="btn btn--dark btn--sm" data-action="open-guide">Abrir guia</button>
             </div>
@@ -378,10 +480,10 @@
         <span class="tab-btn__icon">✅</span><span>Check-in</span>
       </button>
       <button class="tab-btn" data-nav-target="history">
-        <span class="tab-btn__icon">📋</span><span>Histórico</span>
+        <span class="tab-btn__icon">📈</span><span>Histórico</span>
       </button>
       <button class="tab-btn" data-nav-target="progress">
-        <span class="tab-btn__icon">📈</span><span>Progresso</span>
+        <span class="tab-btn__icon">🔥</span><span>Progresso</span>
       </button>
       <button class="tab-btn" data-nav-target="guide">
         <span class="tab-btn__icon">📘</span><span>Guia</span>

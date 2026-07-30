@@ -17,11 +17,11 @@ const Checkin = {
   },
 
   _bindOptionGroups() {
-    document.querySelectorAll('#viewCheckin [data-toggle-group="trained"] .toggle-btn').forEach((btn) => {
+    document.querySelectorAll('#view-checkin [data-toggle-group="trained"] .toggle-btn').forEach((btn) => {
       btn.addEventListener('click', () => this._selectToggle('trained', btn, 'trainedRow'));
     });
 
-    document.querySelectorAll('#viewCheckin [data-toggle-group="sleptWell"] .toggle-btn').forEach((btn) => {
+    document.querySelectorAll('#view-checkin [data-toggle-group="sleptWell"] .toggle-btn').forEach((btn) => {
       btn.addEventListener('click', () => this._selectToggle('sleptWell', btn, 'sleptWellRow'));
     });
 
