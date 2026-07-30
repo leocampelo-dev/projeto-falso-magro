@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<title>Projeto Falso Magro — 30 Dias</title>
+<meta name="description" content="Desafio de 30 dias com metas de calorias, macros e acompanhamento diário." />
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#0D0D0D" />
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Falso Magro" />
+
+<link rel="icon" href="assets/icons/icon-192.png" />
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+<div id="toastStack" class="toast-stack" aria-live="polite"></div>
+
+<!-- ============================================================
+     SPLASH
+     ============================================================ -->
+<div id="splash" class="splash">
+  <div class="splash__logo">🔥</div>
+</div>
+
+<div id="app">
+
+  <!-- ============================================================
+       TELA: SENHA DE ACESSO
+       ============================================================ -->
+  <section id="screenAuth" class="screen">
+    <div class="auth-screen">
+      <div class="auth-screen__logo">🔥</div>
+      <h1 class="auth-screen__title">Projeto Falso Magro</h1>
+      <p class="auth-screen__sub">Digite a senha de acesso que você recebeu na sua compra para liberar o desafio.</p>
+
+      <form id="authForm" class="auth-screen__form" novalidate>
+        <div class="field">
+          <input
+            id="authPasswordInput"
+            class="input"
+            type="password"
+            inputmode="text"
+            autocomplete="off"
+            placeholder="SENHA DE ACESSO"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn--primary">Liberar acesso</button>
+        <p id="authError" class="auth-screen__error"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TELA: BOAS-VINDAS (ONBOARDING)
+       ============================================================ -->
+  <section id="screenWelcome" class="screen">
+    <div class="welcome-screen">
+      <div class="welcome-screen__inner">
+        <div class="onboarding-steps"><span class="is-active"></span><span></span></div>
+        <div class="welcome-screen__emoji">👋</div>
+        <h1 class="welcome-screen__title">Vamos começar sua transformação</h1>
+        <p class="welcome-screen__sub">Antes de tudo, como podemos te chamar? Vamos personalizar sua experiência neste desafio de 30 dias.</p>
+
+        <form id="welcomeForm" class="welcome-screen__form" novalidate>
+          <div class="field">
+            <label class="field__label" for="welcomeNameInput">Seu primeiro nome</label>
+            <input
+              id="welcomeNameInput"
+              class="input"
+              type="text"
+              placeholder="Ex: Leonardo"
+              autocomplete="given-name"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn--primary">Começar meu desafio</button>
+          <p class="welcome-screen__note">
+            💡 Seu nome será utilizado apenas para personalizar sua experiência neste dispositivo. Nada é enviado para nenhum servidor.
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TELA: DESAFIO CONCLUÍDO
+       ============================================================ -->
+  <section id="screenComplete" class="screen">
+    <div class="complete-screen">
+      <div class="complete-screen__badge">🏆</div>
+      <h1 class="complete-screen__title">Parabéns!</h1>
+      <p class="complete-screen__sub">Você concluiu os 30 dias do Projeto Falso Magro. Continue registrando seus check-ins para manter a consistência e os resultados.</p>
+      <div style="margin-top: 32px; width: 100%; max-width: 280px;">
+        <button class="btn btn--primary" onclick="App.backToApp()">Ver meu progresso</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TELA PRINCIPAL (APP)
+       ============================================================ -->
+  <section id="screenMain" class="screen">
+    <div class="main-layout">
+
+      <!-- Sidebar (desktop) -->
+      <nav class="sidebar">
+        <div class="sidebar__brand">
+          <div class="sidebar__brand-icon">🔥</div>
+          <div class="sidebar__brand-text">Falso Magro</div>
+        </div>
+
+        <button class="tab-btn is-active" data-nav-target="dashboard">
+          <span class="tab-btn__icon">🏠</span><span>Início</span>
+        </button>
+        <button class="tab-btn" data-nav-target="checkin">
+          <span class="tab-btn__icon">✅</span><span>Check-in</span>
+        </button>
+        <button class="tab-btn" data-nav-target="history">
+          <span class="tab-btn__icon">📋</span><span>Histórico</span>
+        </button>
+        <button class="tab-btn" data-nav-target="progress">
+          <span class="tab-btn__icon">📈</span><span>Progresso</span>
+        </button>
+        <button class="tab-btn" data-nav-target="guide">
+          <span class="tab-btn__icon">📘</span><span>Guia</span>
+        </button>
+      </nav>
+
+      <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+
+        <!-- Header mobile -->
+        <header class="app-header">
+          <span class="app-header__title" id="appHeaderTitle">Início</span>
+          <span style="font-size:18px;">🔥</span>
+        </header>
+
+        <main class="content">
+
+          <!-- ==================== VIEW: DASHBOARD ==================== -->
+          <div id="view-dashboard" class="view is-active">
+
+            <div class="card card--dark hero-card">
+              <span class="hero-card__eyebrow">🔥 Projeto Falso Magro · 30 Dias</span>
+              <h1 class="hero-card__greeting" id="dashGreeting">Olá 👋</h1>
+              <p class="hero-card__sub" id="dashDayLabel">Dia 1 de 30</p>
+
+              <div class="hero-card__ring-row">
+                <div class="ring-wrap">
+                  <svg viewBox="0 0 100 100" width="108" height="108">
+                    <circle class="ring-track" cx="50" cy="50" r="44" />
+                    <circle id="dashRingProgress" class="ring-progress" cx="50" cy="50" r="44" />
+                  </svg>
+                  <div class="ring-label">
+                    <span class="ring-label__num" id="dashRingNum">1</span>
+                    <span class="ring-label__den">/ 30 dias</span>
+                  </div>
+                </div>
+                <div class="hero-card__stats">
+                  <div class="hero-stat"><span class="hero-stat__label">Início do desafio</span><span class="hero-stat__value" id="dashStartDate">—</span></div>
+                  <div class="hero-stat"><span class="hero-stat__label">Último peso</span><span class="hero-stat__value" id="dashLastWeightInline">—</span></div>
+                </div>
+              </div>
+            </div>
+
+            <h2 class="section-title">Seu objetivo diário</h2>
+
+            <div id="dashGoalsEmpty" class="card empty-state">
+              <div class="empty-state__icon">🧮</div>
+              <div class="empty-state__title">Você ainda não calculou suas metas</div>
+              <div class="empty-state__sub">Use a calculadora para descobrir suas calorias e macros ideais.</div>
+              <div style="margin-top:20px;">
+                <button class="btn btn--primary" data-action="open-calculator">Abrir calculadora</button>
+              </div>
+            </div>
+
+            <div id="dashGoalsGrid" class="goal-grid" style="display:none;">
+              <div class="goal-card">
+                <div class="goal-card__icon">🔥</div>
+                <div class="goal-card__value" id="dashCaloriesValue">—</div>
+                <div class="goal-card__label">Calorias</div>
+              </div>
+              <div class="goal-card">
+                <div class="goal-card__icon">🥩</div>
+                <div class="goal-card__value" id="dashProteinValue">—</div>
+                <div class="goal-card__label">Proteína</div>
+              </div>
+              <div class="goal-card">
+                <div class="goal-card__icon">🍚</div>
+                <div class="goal-card__value" id="dashCarbsValue">—</div>
+                <div class="goal-card__label">Carboidratos</div>
+              </div>
+              <div class="goal-card">
+                <div class="goal-card__icon">🥑</div>
+                <div class="goal-card__value" id="dashFatValue">—</div>
+                <div class="goal-card__label">Gorduras</div>
+              </div>
+              <div class="goal-card" style="grid-column: 1 / -1;">
+                <div class="goal-card__icon">💧</div>
+                <div class="goal-card__value" id="dashWaterValue">—</div>
+                <div class="goal-card__label">Água por dia</div>
+              </div>
+            </div>
+
+            <div style="margin-top:16px;">
+              <button class="btn btn--secondary" data-action="open-calculator">Recalcular metas</button>
+            </div>
+
+            <h2 class="section-title">Check-in de hoje</h2>
+            <div class="card">
+              <p style="font-size:14px; color:var(--gray-600); margin-bottom:16px;">
+                Registre seu peso, água, treino e alimentação de hoje em menos de 1 minuto.
+              </p>
+              <button class="btn btn--primary" data-nav-target="checkin">Fazer check-in de hoje</button>
+            </div>
+
+          </div>
+
+          <!-- ==================== VIEW: CHECK-IN ==================== -->
+          <div id="view-checkin" class="view">
+            <h2 class="section-title" style="margin-top:0;">Como foi o seu dia?</h2>
+
+            <div class="card">
+              <div class="field">
+                <label class="field__label" for="checkinWeight">Peso de hoje (kg)</label>
+                <input id="checkinWeight" class="input" type="number" step="0.1" min="0" placeholder="Ex: 78.4" inputmode="decimal" />
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="checkinWater">Água ingerida (ml)</label>
+                <input id="checkinWater" class="input" type="number" step="50" min="0" placeholder="Ex: 2500" inputmode="numeric" />
+                <p class="field__hint">Se preferir, some copos e garrafas do dia em mililitros.</p>
+              </div>
+
+              <div class="field">
+                <label class="field__label">Treinou hoje?</label>
+                <div class="toggle-row" id="trainedRow" data-toggle-group="trained">
+                  <button type="button" class="toggle-btn" data-value="sim">Sim</button>
+                  <button type="button" class="toggle-btn" data-value="nao">Não</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label">Dormiu bem?</label>
+                <div class="toggle-row" id="sleptWellRow" data-toggle-group="sleptWell">
+                  <button type="button" class="toggle-btn" data-value="sim">Sim</button>
+                  <button type="button" class="toggle-btn" data-value="nao">Não</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label">Nível de energia (1 a 10)</label>
+                <div class="scale-row" id="energyScale">
+                  <button type="button" class="scale-dot" data-value="1">1</button>
+                  <button type="button" class="scale-dot" data-value="2">2</button>
+                  <button type="button" class="scale-dot" data-value="3">3</button>
+                  <button type="button" class="scale-dot" data-value="4">4</button>
+                  <button type="button" class="scale-dot" data-value="5">5</button>
+                  <button type="button" class="scale-dot" data-value="6">6</button>
+                  <button type="button" class="scale-dot" data-value="7">7</button>
+                  <button type="button" class="scale-dot" data-value="8">8</button>
+                  <button type="button" class="scale-dot" data-value="9">9</button>
+                  <button type="button" class="scale-dot" data-value="10">10</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label">Como foi sua alimentação hoje?</label>
+                <div class="option-group" id="nutritionOptions">
+                  <button type="button" class="option-chip" data-value="excelente">Excelente</button>
+                  <button type="button" class="option-chip" data-value="boa">Boa</button>
+                  <button type="button" class="option-chip" data-value="regular">Regular</button>
+                  <button type="button" class="option-chip" data-value="ruim">Ruim</button>
+                </div>
+              </div>
+
+              <div class="field" style="margin-bottom:0;">
+                <label class="field__label" for="checkinNotes">Observações (opcional)</label>
+                <textarea id="checkinNotes" class="textarea" placeholder="Como você se sentiu hoje?"></textarea>
+              </div>
+            </div>
+
+            <div style="margin-top:20px;">
+              <button class="btn btn--primary" data-action="save-checkin">Salvar check-in</button>
+            </div>
+          </div>
+
+          <!-- ==================== VIEW: HISTÓRICO ==================== -->
+          <div id="view-history" class="view">
+            <h2 class="section-title" style="margin-top:0;">Seu histórico</h2>
+
+            <div id="historyLastWeight" class="card" style="display:none; align-items:center; justify-content:space-between; flex-direction:row;">
+              <div>
+                <div style="font-size:13px; color:var(--gray-600);">Último peso registrado</div>
+                <div id="historyLastWeightValue" class="goal-card__value" style="margin-top:4px;">—</div>
+              </div>
+              <div id="historyLastWeightDate" class="history-item__tag">—</div>
+            </div>
+
+            <div class="card" style="margin-top:16px;">
+              <div id="historyList"></div>
+              <div id="historyEmpty" class="empty-state" style="display:none;">
+                <div class="empty-state__icon">📋</div>
+                <div class="empty-state__title">Nenhum check-in ainda</div>
+                <div class="empty-state__sub">Seus registros diários vão aparecer aqui assim que você começar.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== VIEW: PROGRESSO ==================== -->
+          <div id="view-progress" class="view">
+            <h2 class="section-title" style="margin-top:0;">Seu progresso</h2>
+
+            <div class="card">
+              <div class="progress-track">
+                <div id="progressFill" class="progress-fill" style="width:0%;"></div>
+              </div>
+              <div class="progress-meta">
+                <span id="progressMeta">0 de 30 dias</span>
+                <span>30 dias</span>
+              </div>
+
+              <div id="progressGrid" class="day-grid"></div>
+            </div>
+          </div>
+
+          <!-- ==================== VIEW: GUIA & ORIENTAÇÕES ==================== -->
+          <div id="view-guide" class="view">
+            <h2 class="section-title" style="margin-top:0;">Guia completo</h2>
+
+            <div class="card" style="display:flex; align-items:center; justify-content:space-between; flex-direction:row; gap:16px;">
+              <div>
+                <div style="font-weight:700; font-family:var(--font-display);">Guia Completo — PDF</div>
+                <div style="font-size:13px; color:var(--gray-600); margin-top:4px;">Todo o passo a passo do desafio</div>
+              </div>
+              <button class="btn btn--dark btn--sm" data-action="open-guide">Abrir guia</button>
+            </div>
+
+            <h2 class="section-title">Leia antes de começar</h2>
+
+            <div class="notice-card">
+              <div class="notice-card__title">📌 Orientações importantes</div>
+              <div class="notice-list">
+                <div class="notice-list__item"><span class="notice-list__bullet">1</span>Faça seu check-in todos os dias, mesmo que seja rápido.</div>
+                <div class="notice-list__item"><span class="notice-list__bullet">2</span>Não pule dias — a consistência é o que gera resultado.</div>
+                <div class="notice-list__item"><span class="notice-list__bullet">3</span>Utilize a calculadora antes de iniciar o desafio.</div>
+                <div class="notice-list__item"><span class="notice-list__bullet">4</span>Para melhores resultados, siga o Guia Completo.</div>
+              </div>
+            </div>
+
+            <div class="notice-card notice-card--danger" style="margin-top:16px;">
+              <div class="notice-card__title">⚠️ Sobre seus dados</div>
+              <div class="notice-list">
+                <div class="notice-list__item"><span class="notice-list__bullet">!</span>O progresso fica salvo apenas neste dispositivo e neste navegador.</div>
+                <div class="notice-list__item"><span class="notice-list__bullet">!</span>Não limpe os dados do navegador durante os 30 dias.</div>
+                <div class="notice-list__item"><span class="notice-list__bullet">!</span>Se limpar o navegador ou apagar os dados do site, todo o progresso será perdido.</div>
+                <div class="notice-list__item"><span class="notice-list__bullet">!</span>Se trocar de celular ou navegador, também perderá os registros.</div>
+              </div>
+            </div>
+          </div>
+
+        </main>
+      </div>
+    </div>
+
+    <!-- Bottom tab bar (mobile) -->
+    <nav class="tab-bar">
+      <button class="tab-btn is-active" data-nav-target="dashboard">
+        <span class="tab-btn__icon">🏠</span><span>Início</span>
+      </button>
+      <button class="tab-btn" data-nav-target="checkin">
+        <span class="tab-btn__icon">✅</span><span>Check-in</span>
+      </button>
+      <button class="tab-btn" data-nav-target="history">
+        <span class="tab-btn__icon">📋</span><span>Histórico</span>
+      </button>
+      <button class="tab-btn" data-nav-target="progress">
+        <span class="tab-btn__icon">📈</span><span>Progresso</span>
+      </button>
+      <button class="tab-btn" data-nav-target="guide">
+        <span class="tab-btn__icon">📘</span><span>Guia</span>
+      </button>
+    </nav>
+  </section>
+
+</div>
+
+<!-- ============================================================
+     MODAL: CALCULADORA
+     ============================================================ -->
+<div id="calculatorOverlay" class="modal-overlay">
+  <div class="modal-sheet">
+    <div class="modal-sheet__handle"></div>
+    <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+      <div>
+        <div class="modal-sheet__title">Calculadora de metas</div>
+        <div class="modal-sheet__sub">Vamos calcular suas calorias e macros ideais.</div>
+      </div>
+      <button id="calculatorCloseBtn" type="button" class="btn--ghost" aria-label="Fechar" style="font-size:20px; padding:6px;">✕</button>
+    </div>
+
+    <form id="calculatorForm" novalidate>
+      <div class="field" style="margin-top:20px;">
+        <label class="field__label">Sexo</label>
+        <div class="option-group" data-option-group="sex">
+          <button type="button" class="option-chip" data-value="masculino">Masculino</button>
+          <button type="button" class="option-chip" data-value="feminino">Feminino</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="calcAge">Idade</label>
+        <input id="calcAge" class="input" type="number" min="14" max="90" placeholder="Ex: 28" inputmode="numeric" />
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="calcWeight">Peso atual (kg)</label>
+        <input id="calcWeight" class="input" type="number" step="0.1" min="30" placeholder="Ex: 78" inputmode="decimal" />
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="calcHeight">Altura (cm)</label>
+        <input id="calcHeight" class="input" type="number" min="120" max="230" placeholder="Ex: 175" inputmode="numeric" />
+      </div>
+
+      <div class="field">
+        <label class="field__label">Nível de atividade</label>
+        <div class="option-group" data-option-group="activity">
+          <button type="button" class="option-chip" data-value="sedentario">Sedentário</button>
+          <button type="button" class="option-chip" data-value="leve">Leve (1-3x/sem)</button>
+          <button type="button" class="option-chip" data-value="moderado">Moderado (3-5x/sem)</button>
+          <button type="button" class="option-chip" data-value="alto">Alto (6-7x/sem)</button>
+          <button type="button" class="option-chip" data-value="muito_alto" style="grid-column: 1 / -1;">Muito alto (atleta / trabalho físico)</button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:24px;">
+        <label class="field__label">Objetivo</label>
+        <div class="option-group option-group--3" data-option-group="goal">
+          <button type="button" class="option-chip" data-value="perder_gordura">Perder gordura</button>
+          <button type="button" class="option-chip" data-value="recomposicao">Recomposição</button>
+          <button type="button" class="option-chip" data-value="ganhar_massa">Ganhar massa</button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn--primary">Calcular minhas metas</button>
+    </form>
+  </div>
+</div>
+
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/calculator.js"></script>
+<script src="assets/js/dashboard.js"></script>
+<script src="assets/js/checkin.js"></script>
+<script src="assets/js/progress.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
