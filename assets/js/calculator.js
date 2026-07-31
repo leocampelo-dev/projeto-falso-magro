@@ -9,11 +9,11 @@
  */
 
 const ACTIVITY_FACTORS = {
-  sedentario: 1.2,
-  leve: 1.375,
-  moderado: 1.55,
-  alto: 1.725,
-  muito_alto: 1.9,
+  sedentario: 1.1,
+  leve: 1.2,
+  moderado: 1.3,
+  alto: 1.5,
+  muito_alto: 1.6,
 };
 
 const FIXED_GOAL_SETTINGS = { calorieAdjust: -0.20, proteinPerKg: 2.2 };
