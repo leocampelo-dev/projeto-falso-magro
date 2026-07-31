@@ -322,7 +322,13 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   font-size: 14px;
   font-weight: 600;
   color: var(--gray-600);
-  margin-bottom: var(--space-2);
+}
+
+.welcome-intro__motivation {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--orange-dark);
+  margin-top: 6px;
 }
 
 .welcome-intro__title {
@@ -330,40 +336,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   font-size: 22px;
   font-weight: 800;
   line-height: 1.25;
-}
-
-.welcome-intro__sub {
-  font-size: 14px;
-  color: var(--gray-600);
   margin-top: var(--space-3);
-}
-
-.welcome-intro__list {
-  list-style: none;
-  margin-top: var(--space-3);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.welcome-intro__list li {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--black);
-  padding-left: 22px;
-  position: relative;
-}
-.welcome-intro__list li::before {
-  content: '🔥';
-  position: absolute;
-  left: 0;
-  font-size: 12px;
-}
-
-.welcome-intro__cta {
-  margin-top: var(--space-4);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--orange-dark);
 }
 
 /* ---- Vídeo de boas-vindas ---- */
@@ -457,6 +430,34 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   color: var(--gray-400);
   margin-top: var(--space-2);
 }
+
+/* Estado visual de passo já concluído */
+.step-card.is-complete {
+  background: rgba(31, 169, 122, 0.05);
+  border-color: rgba(31, 169, 122, 0.35);
+}
+.step-card.is-complete .step-card__number {
+  background: var(--success);
+}
+.step-card.is-complete .btn--primary {
+  background: var(--white);
+  color: var(--success);
+  border: 1.5px solid var(--success);
+  box-shadow: none;
+}
+
+/* ---- Botão de voltar (Guia Completo) ---- */
+.guide-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-700);
+  padding: 8px 4px;
+  margin-bottom: var(--space-4);
+}
+.guide-back-btn:active { opacity: 0.6; }
 
 /* ---- Grid de metas / macros ---- */
 .goal-grid {

@@ -149,14 +149,8 @@
             <!-- Bem-vindo: responde "o que é isto?" em segundos -->
             <div class="card welcome-intro">
               <span class="welcome-intro__greeting" id="dashGreeting">Olá 👋</span>
+              <p class="welcome-intro__motivation">Siga as etapas abaixo e comece sua transformação.</p>
               <h1 class="welcome-intro__title">Bem-vindo ao Projeto Falso Magro 30 Dias</h1>
-              <p class="welcome-intro__sub">Durante os próximos 30 dias você terá um único objetivo:</p>
-              <ul class="welcome-intro__list">
-                <li>Reduzir gordura corporal</li>
-                <li>Ganhar massa muscular</li>
-                <li>Criar consistência</li>
-              </ul>
-              <p class="welcome-intro__cta">👇 Siga estes quatro passos para começar.</p>
             </div>
 
             <!-- Vídeo de boas-vindas -->
@@ -169,114 +163,38 @@
               </div>
             </div>
 
-            <!-- Comece por aqui: os 4 passos -->
+            <!-- Comece por aqui: os passos -->
             <h2 class="section-title">Comece por aqui</h2>
 
-            <div class="step-card">
+            <div id="stepCardGoals" class="step-card">
               <div class="step-card__head">
                 <span class="step-card__number">1</span>
-                <div class="step-card__title">Calcule suas metas</div>
+                <div class="step-card__title" id="stepTitleGoals">Calcule suas metas</div>
                 <span class="step-card__check" id="stepCheckGoals" style="display:none;">✓</span>
               </div>
               <p class="step-card__desc">Informe idade, peso e altura para descobrir quantas calorias e quantos macronutrientes consumir diariamente.</p>
-              <button class="btn btn--primary" data-action="open-calculator">Calcular minhas metas</button>
+              <button class="btn btn--primary" id="stepBtnGoals" data-action="open-calculator">Calcular minhas metas</button>
               <p class="step-card__hint">Leva menos de dois minutos.</p>
             </div>
 
             <div class="step-card">
               <div class="step-card__head">
                 <span class="step-card__number">2</span>
-                <div class="step-card__title">Monte sua alimentação</div>
+                <div class="step-card__title">Abra o Guia Completo</div>
               </div>
-              <p class="step-card__desc">Abra o Guia Completo e escolha alimentos equivalentes para montar sua dieta de forma simples.</p>
+              <p class="step-card__desc">No Guia Completo você encontrará como montar sua alimentação, exemplos de dieta, sugestões de treino e orientações gerais do projeto.</p>
               <button class="btn btn--secondary" data-nav-target="guide">Abrir Guia Completo</button>
             </div>
 
-            <div class="step-card">
+            <div id="stepCardCheckin" class="step-card">
               <div class="step-card__head">
                 <span class="step-card__number">3</span>
-                <div class="step-card__title">Escolha seu treino</div>
-              </div>
-              <p class="step-card__desc">Dentro do Guia você encontrará sugestões de treinos para diferentes níveis.</p>
-              <button class="btn btn--secondary" data-nav-target="guide">Ver Treinos</button>
-            </div>
-
-            <div class="step-card">
-              <div class="step-card__head">
-                <span class="step-card__number">4</span>
-                <div class="step-card__title">Faça seu check-in diário</div>
+                <div class="step-card__title" id="stepTitleCheckin">Faça seu check-in diário</div>
                 <span class="step-card__check" id="stepCheckToday" style="display:none;">✓</span>
               </div>
               <p class="step-card__desc">Registre diariamente seu peso, água, treino, alimentação e energia para acompanhar sua evolução.</p>
-              <button class="btn btn--primary" data-nav-target="checkin">Fazer Check-in</button>
-            </div>
-
-            <!-- Só depois dos 4 passos: progresso, metas e estatísticas -->
-            <h2 class="section-title">Seu progresso</h2>
-
-            <div class="card card--dark hero-card">
-              <span class="hero-card__eyebrow">🔥 Projeto Falso Magro · 30 Dias</span>
-              <p class="hero-card__sub" id="dashDayLabel">Dia 1 de 30</p>
-
-              <div class="hero-card__ring-row">
-                <div class="ring-wrap">
-                  <svg viewBox="0 0 100 100" width="108" height="108">
-                    <circle class="ring-track" cx="50" cy="50" r="44" />
-                    <circle id="dashRingProgress" class="ring-progress" cx="50" cy="50" r="44" />
-                  </svg>
-                  <div class="ring-label">
-                    <span class="ring-label__num" id="dashRingNum">1</span>
-                    <span class="ring-label__den">/ 30 dias</span>
-                  </div>
-                </div>
-                <div class="hero-card__stats">
-                  <div class="hero-stat"><span class="hero-stat__label">Início do desafio</span><span class="hero-stat__value" id="dashStartDate">—</span></div>
-                  <div class="hero-stat"><span class="hero-stat__label">Último peso</span><span class="hero-stat__value" id="dashLastWeightInline">—</span></div>
-                </div>
-              </div>
-            </div>
-
-            <h2 class="section-title">Suas metas diárias</h2>
-
-            <div id="dashGoalsEmpty" class="card empty-state">
-              <div class="empty-state__icon">🧮</div>
-              <div class="empty-state__title">Você ainda não calculou suas metas</div>
-              <div class="empty-state__sub">Use a calculadora para descobrir suas calorias e macros ideais.</div>
-              <div style="margin-top:20px;">
-                <button class="btn btn--primary" data-action="open-calculator">Abrir calculadora</button>
-              </div>
-            </div>
-
-            <div id="dashGoalsGrid" class="goal-grid" style="display:none;">
-              <div class="goal-card">
-                <div class="goal-card__icon">🔥</div>
-                <div class="goal-card__value" id="dashCaloriesValue">—</div>
-                <div class="goal-card__label">Calorias</div>
-              </div>
-              <div class="goal-card">
-                <div class="goal-card__icon">🥩</div>
-                <div class="goal-card__value" id="dashProteinValue">—</div>
-                <div class="goal-card__label">Proteína</div>
-              </div>
-              <div class="goal-card">
-                <div class="goal-card__icon">🍚</div>
-                <div class="goal-card__value" id="dashCarbsValue">—</div>
-                <div class="goal-card__label">Carboidratos</div>
-              </div>
-              <div class="goal-card">
-                <div class="goal-card__icon">🥑</div>
-                <div class="goal-card__value" id="dashFatValue">—</div>
-                <div class="goal-card__label">Gorduras</div>
-              </div>
-              <div class="goal-card" style="grid-column: 1 / -1;">
-                <div class="goal-card__icon">💧</div>
-                <div class="goal-card__value" id="dashWaterValue">—</div>
-                <div class="goal-card__label">Água por dia</div>
-              </div>
-            </div>
-
-            <div style="margin-top:16px;">
-              <button class="btn btn--secondary" data-action="open-calculator">Recalcular metas</button>
+              <button class="btn btn--primary" id="stepBtnCheckin" data-nav-target="checkin">Fazer Check-in</button>
+              <p class="step-card__hint" id="stepCheckinMeta" style="display:none;"></p>
             </div>
 
           </div>
@@ -385,7 +303,29 @@
           <div id="view-progress" class="view">
             <h2 class="section-title" style="margin-top:0;">Seu progresso</h2>
 
-            <div class="stat-trio">
+            <div class="card card--dark hero-card">
+              <span class="hero-card__eyebrow">🔥 Projeto Falso Magro · 30 Dias</span>
+              <p class="hero-card__sub" id="dashDayLabel">Dia 1 de 30</p>
+
+              <div class="hero-card__ring-row">
+                <div class="ring-wrap">
+                  <svg viewBox="0 0 100 100" width="108" height="108">
+                    <circle class="ring-track" cx="50" cy="50" r="44" />
+                    <circle id="dashRingProgress" class="ring-progress" cx="50" cy="50" r="44" />
+                  </svg>
+                  <div class="ring-label">
+                    <span class="ring-label__num" id="dashRingNum">1</span>
+                    <span class="ring-label__den">/ 30 dias</span>
+                  </div>
+                </div>
+                <div class="hero-card__stats">
+                  <div class="hero-stat"><span class="hero-stat__label">Início do desafio</span><span class="hero-stat__value" id="dashStartDate">—</span></div>
+                  <div class="hero-stat"><span class="hero-stat__label">Último peso</span><span class="hero-stat__value" id="dashLastWeightInline">—</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="stat-trio" style="margin-top:16px;">
               <div class="stat-trio__item">
                 <div class="stat-trio__value" id="progressStreak">0</div>
                 <div class="stat-trio__label">Dias seguidos</div>
@@ -417,10 +357,55 @@
                 <span><i class="legend-dot legend-dot--today"></i> Hoje</span>
               </div>
             </div>
+
+            <h2 class="section-title">Suas metas diárias</h2>
+
+            <div id="dashGoalsEmpty" class="card empty-state">
+              <div class="empty-state__icon">🧮</div>
+              <div class="empty-state__title">Você ainda não calculou suas metas</div>
+              <div class="empty-state__sub">Use a calculadora para descobrir suas calorias e macros ideais.</div>
+              <div style="margin-top:20px;">
+                <button class="btn btn--primary" data-action="open-calculator">Abrir calculadora</button>
+              </div>
+            </div>
+
+            <div id="dashGoalsGrid" class="goal-grid" style="display:none;">
+              <div class="goal-card">
+                <div class="goal-card__icon">🔥</div>
+                <div class="goal-card__value" id="dashCaloriesValue">—</div>
+                <div class="goal-card__label">Calorias</div>
+              </div>
+              <div class="goal-card">
+                <div class="goal-card__icon">🥩</div>
+                <div class="goal-card__value" id="dashProteinValue">—</div>
+                <div class="goal-card__label">Proteína</div>
+              </div>
+              <div class="goal-card">
+                <div class="goal-card__icon">🍚</div>
+                <div class="goal-card__value" id="dashCarbsValue">—</div>
+                <div class="goal-card__label">Carboidratos</div>
+              </div>
+              <div class="goal-card">
+                <div class="goal-card__icon">🥑</div>
+                <div class="goal-card__value" id="dashFatValue">—</div>
+                <div class="goal-card__label">Gorduras</div>
+              </div>
+              <div class="goal-card" style="grid-column: 1 / -1;">
+                <div class="goal-card__icon">💧</div>
+                <div class="goal-card__value" id="dashWaterValue">—</div>
+                <div class="goal-card__label">Água por dia</div>
+              </div>
+            </div>
+
+            <div id="dashRecalcWrap" style="margin-top:16px; display:none;">
+              <button class="btn btn--secondary" data-action="open-calculator">Recalcular metas</button>
+            </div>
           </div>
 
           <!-- ==================== VIEW: GUIA & ORIENTAÇÕES ==================== -->
           <div id="view-guide" class="view">
+            <button type="button" class="guide-back-btn" data-nav-target="dashboard">← Voltar ao Início</button>
+
             <h2 class="section-title" style="margin-top:0;">Guia Completo</h2>
 
             <div class="card guide-features">
@@ -502,7 +487,7 @@
     <div style="display:flex; align-items:flex-start; justify-content:space-between;">
       <div>
         <div class="modal-sheet__title">Calculadora de metas</div>
-        <div class="modal-sheet__sub">Vamos calcular suas calorias e macros ideais.</div>
+        <div class="modal-sheet__sub">Vamos calcular suas calorias e macros ideais para perder gordura.</div>
       </div>
       <button id="calculatorCloseBtn" type="button" class="btn--ghost" aria-label="Fechar" style="font-size:20px; padding:6px;">✕</button>
     </div>
@@ -531,7 +516,7 @@
         <input id="calcHeight" class="input" type="number" min="120" max="230" placeholder="Ex: 175" inputmode="numeric" />
       </div>
 
-      <div class="field">
+      <div class="field" style="margin-bottom:24px;">
         <label class="field__label">Nível de atividade</label>
         <div class="option-group" data-option-group="activity">
           <button type="button" class="option-chip" data-value="sedentario">Sedentário</button>
@@ -539,15 +524,6 @@
           <button type="button" class="option-chip" data-value="moderado">Moderado (3-5x/sem)</button>
           <button type="button" class="option-chip" data-value="alto">Alto (6-7x/sem)</button>
           <button type="button" class="option-chip" data-value="muito_alto" style="grid-column: 1 / -1;">Muito alto (atleta / trabalho físico)</button>
-        </div>
-      </div>
-
-      <div class="field" style="margin-bottom:24px;">
-        <label class="field__label">Objetivo</label>
-        <div class="option-group option-group--3" data-option-group="goal">
-          <button type="button" class="option-chip" data-value="perder_gordura">Perder gordura</button>
-          <button type="button" class="option-chip" data-value="recomposicao">Recomposição</button>
-          <button type="button" class="option-chip" data-value="ganhar_massa">Ganhar massa</button>
         </div>
       </div>
 

@@ -240,27 +240,26 @@ const App = {
   _submitCalculator() {
     const sexGroup = document.querySelector('[data-option-group="sex"]');
     const activityGroup = document.querySelector('[data-option-group="activity"]');
-    const goalGroup = document.querySelector('[data-option-group="goal"]');
 
     const sex = sexGroup?.dataset.value;
     const activityLevel = activityGroup?.dataset.value;
-    const goal = goalGroup?.dataset.value;
 
     const age = document.getElementById('calcAge').value;
     const weight = document.getElementById('calcWeight').value;
     const height = document.getElementById('calcHeight').value;
 
-    if (!sex || !activityLevel || !goal || !age || !weight || !height) {
+    if (!sex || !activityLevel || !age || !weight || !height) {
       Toast.show('Preencha todos os campos para calcular.', 'error');
       return;
     }
 
-    const goals = Calculator.calculateGoals({ sex, age, weight, height, activityLevel, goal });
+    const goals = Calculator.calculateGoals({ sex, age, weight, height, activityLevel });
     Storage.saveGoals(goals);
 
     this._closeCalculatorModal();
     Toast.show('Metas calculadas com sucesso!', 'success');
     Dashboard.render();
+    Progress.render();
   },
 
   /* ---------- Tela de conclusão do desafio ---------- */

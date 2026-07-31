@@ -1,7 +1,8 @@
 /**
  * progress.js
- * Renderiza a tela de progresso (barra + grade de 30 dias)
- * e a tela de histórico (lista de check-ins anteriores).
+ * Renderiza a aba Progresso: anel do dia atual, metas calculadas (calorias/macros),
+ * estatísticas (sequência, total, percentual) e a grade de 30 dias.
+ * Também renderiza a aba Histórico (lista de check-ins anteriores).
  */
 
 const Progress = {
@@ -9,12 +10,18 @@ const Progress = {
     const user = Storage.getUser();
     if (!user) return;
 
+    const rawDay = Utils.getCurrentChallengeDay(user.startDate);
+    const isComplete = rawDay > CHALLENGE_LENGTH_DAYS;
+    const currentDay = Math.min(rawDay, CHALLENGE_LENGTH_DAYS);
+
     const checkins = Storage.getCheckins();
     const doneDays = new Set(checkins.map((c) => c.dayNumber));
-    const currentDay = Math.min(Utils.getCurrentChallengeDay(user.startDate), CHALLENGE_LENGTH_DAYS);
-
     const completedCount = doneDays.size;
     const ratio = Math.min(completedCount / CHALLENGE_LENGTH_DAYS, 1);
+
+    this._renderRing(currentDay, isComplete);
+    this._renderQuickStats(user);
+    this._renderGoals();
 
     const fillEl = document.getElementById('progressFill');
     if (fillEl) fillEl.style.width = `${ratio * 100}%`;
@@ -26,6 +33,74 @@ const Progress = {
     this._renderStats(doneDays, currentDay, completedCount);
   },
 
+  /* ---------- Anel "Dia X de 30" ---------- */
+  _renderRing(day, isComplete) {
+    const dayLabel = document.getElementById('dashDayLabel');
+    const ringProgress = document.getElementById('dashRingProgress');
+    const ringNum = document.getElementById('dashRingNum');
+
+    if (dayLabel) {
+      dayLabel.textContent = isComplete
+        ? 'Desafio concluído 🎉'
+        : `Dia ${day} de ${CHALLENGE_LENGTH_DAYS}`;
+    }
+
+    const radius = 44;
+    const circumference = 2 * Math.PI * radius;
+    const progressRatio = Math.min(day / CHALLENGE_LENGTH_DAYS, 1);
+    const offset = circumference - progressRatio * circumference;
+
+    if (ringProgress) {
+      ringProgress.style.strokeDasharray = `${circumference}`;
+      ringProgress.style.strokeDashoffset = `${offset}`;
+    }
+    if (ringNum) ringNum.textContent = day;
+  },
+
+  _renderQuickStats(user) {
+    const startEl = document.getElementById('dashStartDate');
+    if (startEl) startEl.textContent = Utils.formatDateLabel(user.startDate);
+
+    const lastWeightEl = document.getElementById('dashLastWeightInline');
+    if (lastWeightEl) {
+      const last = Storage.getLastCheckin();
+      lastWeightEl.textContent = last ? `${last.weight} kg` : '—';
+    }
+  },
+
+  /* ---------- Metas diárias (calorias e macros) ---------- */
+  _renderGoals() {
+    const goals = Storage.getGoals();
+    const emptyState = document.getElementById('dashGoalsEmpty');
+    const grid = document.getElementById('dashGoalsGrid');
+    const recalcWrap = document.getElementById('dashRecalcWrap');
+
+    if (!goals) {
+      if (emptyState) emptyState.style.display = 'block';
+      if (grid) grid.style.display = 'none';
+      if (recalcWrap) recalcWrap.style.display = 'none';
+      return;
+    }
+
+    if (emptyState) emptyState.style.display = 'none';
+    if (grid) grid.style.display = 'grid';
+    if (recalcWrap) recalcWrap.style.display = 'block';
+
+    const map = {
+      dashCalories: { value: goals.calories, unit: 'kcal' },
+      dashProtein: { value: goals.protein, unit: 'g' },
+      dashCarbs: { value: goals.carbs, unit: 'g' },
+      dashFat: { value: goals.fat, unit: 'g' },
+      dashWater: { value: (goals.water / 1000).toFixed(1), unit: 'L' },
+    };
+
+    Object.entries(map).forEach(([id, { value, unit }]) => {
+      const valueEl = document.getElementById(`${id}Value`);
+      if (valueEl) valueEl.innerHTML = `${value}<span class="goal-card__unit"> ${unit}</span>`;
+    });
+  },
+
+  /* ---------- Estatísticas (sequência, total, percentual) ---------- */
   _renderStats(doneDays, currentDay, completedCount) {
     const streak = this._calculateStreak(doneDays, currentDay);
     const percent = Math.round((completedCount / CHALLENGE_LENGTH_DAYS) * 100);
@@ -51,6 +126,7 @@ const Progress = {
     return streak;
   },
 
+  /* ---------- Grade de 30 dias ---------- */
   _renderGrid(doneDays, currentDay) {
     const grid = document.getElementById('progressGrid');
     if (!grid) return;

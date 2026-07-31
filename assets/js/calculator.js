@@ -2,6 +2,10 @@
  * calculator.js
  * Cálculo de TMB, GET, calorias e macronutrientes.
  * Fórmula utilizada: Mifflin-St Jeor (referência confiável e amplamente validada).
+ *
+ * Este produto é voltado exclusivamente para o perfil "falso magro" (perda de gordura
+ * com preservação/ganho de massa magra) — por isso o objetivo é sempre fixo,
+ * sem seleção pelo usuário.
  */
 
 const ACTIVITY_FACTORS = {
@@ -12,11 +16,7 @@ const ACTIVITY_FACTORS = {
   muito_alto: 1.9,
 };
 
-const GOAL_SETTINGS = {
-  perder_gordura: { calorieAdjust: -0.20, proteinPerKg: 2.2 },
-  recomposicao: { calorieAdjust: -0.08, proteinPerKg: 2.0 },
-  ganhar_massa: { calorieAdjust: 0.12, proteinPerKg: 1.8 },
-};
+const FIXED_GOAL_SETTINGS = { calorieAdjust: -0.20, proteinPerKg: 2.2 };
 
 const Calculator = {
   /** Taxa Metabólica Basal — fórmula de Mifflin-St Jeor */
@@ -33,15 +33,14 @@ const Calculator = {
 
   /** Monta o objetivo diário completo a partir dos dados do formulário */
   calculateGoals(formData) {
-    const { sex, age, weight, height, activityLevel, goal } = formData;
+    const { sex, age, weight, height, activityLevel } = formData;
 
     const tmb = this.calculateTMB({ sex, weight: Number(weight), height: Number(height), age: Number(age) });
     const get = this.calculateGET(tmb, activityLevel);
 
-    const settings = GOAL_SETTINGS[goal];
-    const calories = get * (1 + settings.calorieAdjust);
+    const calories = get * (1 + FIXED_GOAL_SETTINGS.calorieAdjust);
 
-    const proteinGrams = settings.proteinPerKg * Number(weight);
+    const proteinGrams = FIXED_GOAL_SETTINGS.proteinPerKg * Number(weight);
     const proteinCalories = proteinGrams * 4;
 
     const fatCalories = calories * 0.25;
@@ -60,7 +59,7 @@ const Calculator = {
       carbs: Math.round(carbsGrams),
       fat: Math.round(fatGrams),
       water: Math.round(waterMl),
-      input: { sex, age: Number(age), weight: Number(weight), height: Number(height), activityLevel, goal },
+      input: { sex, age: Number(age), weight: Number(weight), height: Number(height), activityLevel },
       calculatedAt: new Date().toISOString(),
     };
   },
