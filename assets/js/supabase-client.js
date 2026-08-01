@@ -72,8 +72,7 @@ const SupabaseClient = {
     }
 
     const { error } = await _client.auth.verifyOtp({
-      email,
-      token: hashedToken,
+      token_hash: hashedToken,
       type: 'magiclink',
     });
 
