@@ -75,6 +75,7 @@ const App = {
     this._bindCalculatorModal();
     this._bindSignOut();
     this._bindConnectivity();
+    this._bindPeriodicAccessCheck();
     Checkin.init();
     AdminPanel.init();
     this._registerServiceWorker();
@@ -96,6 +97,12 @@ const App = {
   },
 
   async _syncAndEnter() {
+    const stillValid = await Auth.isStillValid();
+    if (!stillValid) {
+      await this._forceSignOutWithMessage('Seu acesso foi bloqueado ou expirou. Entre em contato com quem vendeu o produto.');
+      return;
+    }
+
     Storage.setUserId(Auth.getUserId());
     const syncResult = await Storage.syncFromRemote(Auth.getUserId());
 
@@ -112,6 +119,14 @@ const App = {
     }
 
     this._enterApp();
+  },
+
+  /** Encerra a sessão e volta para a tela de login, exibindo o motivo */
+  async _forceSignOutWithMessage(message) {
+    await Auth.signOut();
+    this._showScreen('screenAuth');
+    const errorEl = document.getElementById('authError');
+    if (errorEl) errorEl.textContent = message;
   },
 
   _showScreen(id) {
@@ -276,6 +291,29 @@ const App = {
     });
 
     window.addEventListener('offline', () => this.renderSyncStatus());
+  },
+
+  /* ---------- Checagem periódica de acesso (detecta bloqueio quase em tempo real) ---------- */
+  _bindPeriodicAccessCheck() {
+    const CHECK_INTERVAL_MS = 3 * 60 * 1000; // 3 minutos
+
+    setInterval(() => this._verifyAccessStillActive(), CHECK_INTERVAL_MS);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') this._verifyAccessStillActive();
+    });
+  },
+
+  async _verifyAccessStillActive() {
+    const mainScreen = document.getElementById('screenMain');
+    const isInsideApp = Auth.isAuthenticated() && mainScreen && mainScreen.classList.contains('is-active');
+    if (!isInsideApp || !navigator.onLine) return;
+
+    const stillValid = await Auth.isStillValid();
+    if (!stillValid) {
+      await this._forceSignOutWithMessage('Seu acesso foi bloqueado ou expirou. Entre em contato com quem vendeu o produto.');
+      Toast.show('Sua sessão foi encerrada.', 'error');
+    }
   },
 
   /* ---------- Navegação entre views ---------- */

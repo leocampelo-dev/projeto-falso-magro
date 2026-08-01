@@ -40,6 +40,13 @@ const SupabaseClient = {
     return !!session && session.user?.app_metadata?.role === 'admin';
   },
 
+  /** Confirma no servidor se o acesso do usuário logado continua ativo (não bloqueado/expirado) */
+  async checkAccessStatus() {
+    const { data, error } = await _client.functions.invoke('check-access-status', {});
+    if (error || !data) return { status: 'unknown' };
+    return data;
+  },
+
   /** Troca um código individual por uma sessão válida */
   async redeemAccessCode(code) {
     const { data, error } = await _client.functions.invoke('redeem-access-code', {

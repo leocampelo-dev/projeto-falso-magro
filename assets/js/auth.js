@@ -57,4 +57,16 @@ const Auth = {
     this._session = null;
     Storage.clearAll();
   },
+
+  /**
+   * Confirma no servidor se o acesso continua ativo (não foi bloqueado/expirado
+   * depois do login). Retorna true se estiver tudo certo, false se o acesso
+   * deve ser encerrado.
+   */
+  async isStillValid() {
+    if (!this._session) return true;
+
+    const result = await SupabaseClient.checkAccessStatus();
+    return result.status !== 'blocked' && result.status !== 'expired';
+  },
 };
