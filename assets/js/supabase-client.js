@@ -72,9 +72,10 @@ const SupabaseClient = {
     }
 
     const { error } = await _client.auth.verifyOtp({
-      token_hash: hashedToken,
+      email,
+      token: hashedToken,
       type: 'magiclink',
-});
+    });
 
     if (error) {
       return { ok: false, error: 'Não foi possível liberar o acesso agora. Tente novamente.' };
