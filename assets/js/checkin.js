@@ -93,7 +93,7 @@ const Checkin = {
     }
 
     const time = new Date(existing.savedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    text.textContent = `Você já fez seu check-in hoje, às ${time}. Pode ajustar as informações abaixo se quiser.`;
+    text.textContent = `Você já fez seu check-in hoje, às ${time}. Volte amanhã para um novo check-in ou pode ajustar as informações abaixo se quiser.`;
     notice.style.display = 'flex';
   },
 
