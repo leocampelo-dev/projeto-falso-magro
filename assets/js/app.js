@@ -126,6 +126,7 @@ const App = {
     Dashboard.render();
     Progress.render();
     History.render();
+    Checkin.refreshTodayState();
     this.renderSyncStatus();
   },
 
@@ -313,6 +314,7 @@ const App = {
     window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
 
     if (viewName === 'history') History.render();
+    if (viewName === 'checkin') Checkin.refreshTodayState();
     if (viewName === 'progress') Progress.render();
     if (viewName === 'admin') AdminPanel.onEnter();
   },

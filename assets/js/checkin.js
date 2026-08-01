@@ -13,7 +13,7 @@ const Checkin = {
 
   init() {
     this._bindOptionGroups();
-    this._prefillToday();
+    this.refreshTodayState();
   },
 
   _bindOptionGroups() {
@@ -51,9 +51,13 @@ const Checkin = {
     btn.classList.add(btn.dataset.value === 'sim' ? 'is-selected--yes' : 'is-selected--no');
   },
 
-  _prefillToday() {
+  /** Preenche o formulário com o check-in de hoje (se já existir) e mostra o aviso correspondente */
+  refreshTodayState() {
     const todayKey = Utils.getDateKey(new Date());
     const existing = Storage.getCheckinByDateKey(todayKey);
+
+    this._renderTodayNotice(existing);
+
     if (!existing) return;
 
     document.getElementById('checkinWeight').value = existing.weight ?? '';
@@ -76,6 +80,21 @@ const Checkin = {
       const chip = document.querySelector(`#nutritionOptions .option-chip[data-value="${existing.nutrition}"]`);
       if (chip) { this.state.nutrition = existing.nutrition; chip.classList.add('is-selected'); }
     }
+  },
+
+  _renderTodayNotice(existing) {
+    const notice = document.getElementById('checkinTodayNotice');
+    const text = document.getElementById('checkinTodayNoticeText');
+    if (!notice || !text) return;
+
+    if (!existing) {
+      notice.style.display = 'none';
+      return;
+    }
+
+    const time = new Date(existing.savedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    text.textContent = `Você já fez seu check-in hoje, às ${time}. Pode ajustar as informações abaixo se quiser.`;
+    notice.style.display = 'flex';
   },
 
   async save() {
@@ -123,6 +142,7 @@ const Checkin = {
     Dashboard.render();
     Progress.render();
     History.render();
+    this._renderTodayNotice(entry);
 
     App.goToView('dashboard');
   },
