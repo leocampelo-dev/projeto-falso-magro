@@ -1,19 +1,32 @@
 /**
  * storage.js
- * Camada única de acesso ao LocalStorage.
- * Nenhum outro arquivo deve chamar localStorage diretamente —
- * tudo passa por aqui para facilitar manutenção.
+ * Camada híbrida de persistência.
+ *
+ *   Supabase     = fonte oficial dos dados
+ *   LocalStorage = cache local / fallback offline
+ *
+ * API pública preservada do modelo anterior (mesmos nomes usados pelo
+ * resto do app): getUser/saveUser/hasUser, getGoals/saveGoals/hasGoals,
+ * getCheckins/saveCheckin/getCheckinByDateKey/getLastCheckin.
+ *
+ * Leituras (getUser, getGoals, getCheckins etc.) continuam SÍNCRONAS: leem do cache local, que é
+ * sincronizado com o Supabase uma vez no boot do app (Storage.syncFromRemote).
+ * Escritas (saveUser, saveGoals, saveCheckin) são ASSÍNCRONAS: tentam gravar no Supabase primeiro;
+ * se falhar (ex: offline), o dado é mantido no cache local e marcado
+ * como "pendingSync" para nova tentativa quando a internet voltar.
  */
 
 const STORAGE_KEYS = {
-  UNLOCKED: 'fm_unlocked',
   USER: 'fm_user',
   GOALS: 'fm_goals',
   CHECKINS: 'fm_checkins',
+  PENDING: 'fm_pending_sync',
 };
 
+let _currentUserId = null;
+
 const Storage = {
-  /* ---------- Acesso genérico ---------- */
+  /* ---------- Acesso genérico ao cache local ---------- */
   _get(key, fallback = null) {
     try {
       const raw = localStorage.getItem(key);
@@ -34,22 +47,188 @@ const Storage = {
     }
   },
 
-  /* ---------- Acesso liberado ao app (senha) ---------- */
-  isUnlocked() {
-    return this._get(STORAGE_KEYS.UNLOCKED, false) === true;
+  /* ---------- Contexto do usuário autenticado ---------- */
+  setUserId(userId) {
+    _currentUserId = userId;
   },
 
-  setUnlocked() {
-    return this._set(STORAGE_KEYS.UNLOCKED, true);
+  getUserId() {
+    return _currentUserId;
   },
 
-  /* ---------- Usuário ---------- */
+  /* ---------- Pendências de sincronização ---------- */
+  _getPending() {
+    return this._get(STORAGE_KEYS.PENDING, { user: false, goals: false, checkins: [] });
+  },
+
+  _setPending(pending) {
+    this._set(STORAGE_KEYS.PENDING, pending);
+  },
+
+  hasPendingSync() {
+    const p = this._getPending();
+    return !!(p.user || p.goals || (p.checkins && p.checkins.length));
+  },
+
+  /* ---------- Sincronização inicial (boot) ---------- */
+  /**
+   * Busca profile/goals/checkins do Supabase e popula o cache local.
+   * Se a busca falhar (ex: sem internet), mantém o que já existir no
+   * cache local (fallback offline) e retorna { ok: false }.
+   */
+  async syncFromRemote(userId) {
+    this.setUserId(userId);
+
+    try {
+      const [profile, goals, checkins] = await Promise.all([
+        SupabaseClient.fetchProfile(userId),
+        SupabaseClient.fetchGoals(userId),
+        SupabaseClient.fetchCheckins(userId),
+      ]);
+
+      if (profile) {
+        this._set(STORAGE_KEYS.USER, this._userFromDb(profile));
+      }
+      if (goals) {
+        this._set(STORAGE_KEYS.GOALS, this._goalsFromDb(goals));
+      } else {
+        this._set(STORAGE_KEYS.GOALS, null);
+      }
+      this._set(STORAGE_KEYS.CHECKINS, checkins.map((c) => this._checkinFromDb(c)));
+
+      return { ok: true };
+    } catch (err) {
+      console.error('Falha ao sincronizar com o Supabase — usando cache local', err);
+      return { ok: false, error: err };
+    }
+  },
+
+  /** Tenta reenviar dados marcados como pendentes (chamado quando a internet volta) */
+  async syncPending() {
+    if (!_currentUserId) return;
+    const pending = this._getPending();
+    let changed = false;
+
+    if (pending.user) {
+      const user = this.getUser();
+      if (user) {
+        try {
+          await SupabaseClient.saveProfile(_currentUserId, this._userToDb(user));
+          pending.user = false;
+          changed = true;
+        } catch (err) {
+          console.warn('Ainda não foi possível sincronizar o perfil', err);
+        }
+      }
+    }
+
+    if (pending.goals) {
+      const goals = this.getGoals();
+      if (goals) {
+        try {
+          await SupabaseClient.saveGoals(_currentUserId, this._goalsToDb(goals));
+          pending.goals = false;
+          changed = true;
+        } catch (err) {
+          console.warn('Ainda não foi possível sincronizar as metas', err);
+        }
+      }
+    }
+
+    if (pending.checkins && pending.checkins.length) {
+      const stillPending = [];
+      for (const dateKey of pending.checkins) {
+        const entry = this.getCheckinByDateKey(dateKey);
+        if (!entry) continue;
+        try {
+          await SupabaseClient.upsertCheckin(_currentUserId, this._checkinToDb(entry));
+          changed = true;
+        } catch (err) {
+          stillPending.push(dateKey);
+        }
+      }
+      pending.checkins = stillPending;
+    }
+
+    if (changed) this._setPending(pending);
+    return { ok: !this.hasPendingSync() };
+  },
+
+  /* ---------- Mapeamento de campos (camelCase local ↔ snake_case Supabase) ---------- */
+  _userFromDb(row) {
+    return {
+      name: row.name,
+      startDate: row.start_date,
+      completionShown: !!row.completion_shown,
+    };
+  },
+  _userToDb(user) {
+    return {
+      name: user.name,
+      start_date: user.startDate,
+      completion_shown: !!user.completionShown,
+    };
+  },
+
+  _goalsFromDb(row) {
+    return {
+      tmb: row.tmb,
+      get: row.get,
+      calories: row.calories,
+      protein: row.protein,
+      carbs: row.carbs,
+      fat: row.fat,
+      water: row.water,
+      input: row.input_data,
+      calculatedAt: row.calculated_at,
+    };
+  },
+  _goalsToDb(goals) {
+    return {
+      tmb: goals.tmb,
+      get: goals.get,
+      calories: goals.calories,
+      protein: goals.protein,
+      carbs: goals.carbs,
+      fat: goals.fat,
+      water: goals.water,
+      input_data: goals.input,
+      calculated_at: goals.calculatedAt,
+    };
+  },
+
+  _checkinFromDb(row) {
+    return {
+      dateKey: row.date_key,
+      dayNumber: row.day_number,
+      weight: row.weight,
+      waterMl: row.water_ml,
+      trained: row.trained,
+      sleptWell: row.slept_well,
+      energy: row.energy,
+      nutrition: row.nutrition,
+      notes: row.notes,
+      savedAt: row.saved_at,
+    };
+  },
+  _checkinToDb(entry) {
+    return {
+      date_key: entry.dateKey,
+      day_number: entry.dayNumber,
+      weight: entry.weight,
+      water_ml: entry.waterMl,
+      trained: entry.trained,
+      slept_well: entry.sleptWell,
+      energy: entry.energy,
+      nutrition: entry.nutrition,
+      notes: entry.notes,
+      saved_at: entry.savedAt,
+    };
+  },
+
+  /* ---------- Usuário / perfil ---------- */
   getUser() {
     return this._get(STORAGE_KEYS.USER, null);
-  },
-
-  saveUser(user) {
-    return this._set(STORAGE_KEYS.USER, user);
   },
 
   hasUser() {
@@ -57,17 +236,54 @@ const Storage = {
     return !!(user && user.name && user.startDate);
   },
 
+  /** Sempre grava no cache local. Tenta gravar no Supabase; se falhar, marca pendingSync. */
+  async saveUser(user) {
+    this._set(STORAGE_KEYS.USER, user);
+
+    if (!_currentUserId) return { ok: false, offline: true };
+
+    try {
+      await SupabaseClient.saveProfile(_currentUserId, this._userToDb(user));
+      const pending = this._getPending();
+      pending.user = false;
+      this._setPending(pending);
+      return { ok: true };
+    } catch (err) {
+      console.error('Falha ao salvar perfil no Supabase — mantido localmente como pendente', err);
+      const pending = this._getPending();
+      pending.user = true;
+      this._setPending(pending);
+      return { ok: false, offline: true };
+    }
+  },
+
   /* ---------- Metas calculadas ---------- */
   getGoals() {
     return this._get(STORAGE_KEYS.GOALS, null);
   },
 
-  saveGoals(goals) {
-    return this._set(STORAGE_KEYS.GOALS, goals);
-  },
-
   hasGoals() {
     return !!this.getGoals();
+  },
+
+  async saveGoals(goals) {
+    this._set(STORAGE_KEYS.GOALS, goals);
+
+    if (!_currentUserId) return { ok: false, offline: true };
+
+    try {
+      await SupabaseClient.saveGoals(_currentUserId, this._goalsToDb(goals));
+      const pending = this._getPending();
+      pending.goals = false;
+      this._setPending(pending);
+      return { ok: true };
+    } catch (err) {
+      console.error('Falha ao salvar metas no Supabase — mantidas localmente como pendentes', err);
+      const pending = this._getPending();
+      pending.goals = true;
+      this._setPending(pending);
+      return { ok: false, offline: true };
+    }
   },
 
   /* ---------- Check-ins diários ---------- */
@@ -75,7 +291,7 @@ const Storage = {
     return this._get(STORAGE_KEYS.CHECKINS, []);
   },
 
-  saveCheckin(entry) {
+  async saveCheckin(entry) {
     const checkins = this.getCheckins();
     const existingIndex = checkins.findIndex((c) => c.dateKey === entry.dateKey);
 
@@ -86,7 +302,24 @@ const Storage = {
     }
 
     checkins.sort((a, b) => a.dateKey.localeCompare(b.dateKey));
-    return this._set(STORAGE_KEYS.CHECKINS, checkins);
+    this._set(STORAGE_KEYS.CHECKINS, checkins);
+
+    if (!_currentUserId) return { ok: false, offline: true };
+
+    try {
+      await SupabaseClient.upsertCheckin(_currentUserId, this._checkinToDb(entry));
+      const pending = this._getPending();
+      pending.checkins = (pending.checkins || []).filter((d) => d !== entry.dateKey);
+      this._setPending(pending);
+      return { ok: true };
+    } catch (err) {
+      console.error('Falha ao salvar check-in no Supabase — mantido localmente como pendente', err);
+      const pending = this._getPending();
+      pending.checkins = pending.checkins || [];
+      if (!pending.checkins.includes(entry.dateKey)) pending.checkins.push(entry.dateKey);
+      this._setPending(pending);
+      return { ok: false, offline: true };
+    }
   },
 
   getCheckinByDateKey(dateKey) {
@@ -101,5 +334,6 @@ const Storage = {
   /* ---------- Utilidades ---------- */
   clearAll() {
     Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
+    _currentUserId = null;
   },
 };

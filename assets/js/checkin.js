@@ -78,7 +78,7 @@ const Checkin = {
     }
   },
 
-  save() {
+  async save() {
     const weight = document.getElementById('checkinWeight').value;
     const waterMl = document.getElementById('checkinWater').value;
     const notes = document.getElementById('checkinNotes').value.trim();
@@ -106,9 +106,20 @@ const Checkin = {
       savedAt: now.toISOString(),
     };
 
-    Storage.saveCheckin(entry);
-    Toast.show('Check-in salvo com sucesso!', 'success');
+    const saveBtn = document.querySelector('[data-action="save-checkin"]');
+    if (saveBtn) saveBtn.disabled = true;
 
+    const result = await Storage.saveCheckin(entry);
+
+    if (saveBtn) saveBtn.disabled = false;
+
+    if (result.ok) {
+      Toast.show('Check-in salvo com sucesso!', 'success');
+    } else {
+      Toast.show('Check-in salvo neste dispositivo — sincronização pendente.', 'error');
+    }
+
+    App.renderSyncStatus();
     Dashboard.render();
     Progress.render();
     History.render();

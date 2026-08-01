@@ -1,7 +1,8 @@
 /**
  * app.js
  * Ponto de entrada da aplicação: utilitários gerais, navegação entre telas,
- * toasts, modal da calculadora e inicialização.
+ * toasts, modal da calculadora, autenticação por código, painel admin e
+ * inicialização.
  */
 
 /* ============================================================
@@ -69,28 +70,48 @@ const App = {
     Toast.init();
     this._bindNav();
     this._bindAuthScreen();
+    this._bindAdminLoginScreen();
     this._bindWelcomeScreen();
     this._bindCalculatorModal();
+    this._bindSignOut();
+    this._bindConnectivity();
     Checkin.init();
+    AdminPanel.init();
     this._registerServiceWorker();
     this._boot();
   },
 
   /* ---------- Fluxo inicial ---------- */
-  _boot() {
-    setTimeout(() => {
-      document.getElementById('splash').classList.add('is-hidden');
+  async _boot() {
+    await Auth.refreshSession();
 
-      if (!Auth.isUnlocked()) {
-        this._showScreen('screenAuth');
-        return;
-      }
-      if (!Storage.hasUser()) {
-        this._showScreen('screenWelcome');
-        return;
-      }
-      this._enterApp();
-    }, 500);
+    document.getElementById('splash').classList.add('is-hidden');
+
+    if (!Auth.isAuthenticated()) {
+      this._showScreen('screenAuth');
+      return;
+    }
+
+    await this._syncAndEnter();
+  },
+
+  async _syncAndEnter() {
+    Storage.setUserId(Auth.getUserId());
+    const syncResult = await Storage.syncFromRemote(Auth.getUserId());
+
+    if (!syncResult.ok && !Storage.hasUser()) {
+      // Sem internet e sem cache local: não há como continuar.
+      Toast.show('Não foi possível conectar. Verifique sua internet e tente novamente.', 'error');
+      this._showScreen('screenAuth');
+      return;
+    }
+
+    if (!Storage.hasUser()) {
+      this._showScreen('screenWelcome');
+      return;
+    }
+
+    this._enterApp();
   },
 
   _showScreen(id) {
@@ -100,35 +121,78 @@ const App = {
 
   _enterApp() {
     this._showScreen('screenMain');
+    this._applyAdminVisibility();
     this.goToView('dashboard');
     Dashboard.render();
     Progress.render();
     History.render();
+    this.renderSyncStatus();
   },
 
-  /* ---------- Tela de senha ---------- */
+  _applyAdminVisibility() {
+    const isAdmin = Auth.isAdmin();
+    const sidebarBtn = document.getElementById('navAdminSidebar');
+    const panelLink = document.getElementById('adminPanelLink');
+    if (sidebarBtn) sidebarBtn.style.display = isAdmin ? '' : 'none';
+    if (panelLink) panelLink.style.display = isAdmin ? '' : 'none';
+  },
+
+  /* ---------- Tela de código de acesso ---------- */
   _bindAuthScreen() {
     const form = document.getElementById('authForm');
-    const input = document.getElementById('authPasswordInput');
+    const input = document.getElementById('authCodeInput');
     const errorEl = document.getElementById('authError');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const adminToggle = document.getElementById('authAdminToggle');
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      errorEl.textContent = '';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Verificando...';
 
-      if (Auth.checkPassword(input.value)) {
-        Auth.unlock();
-        errorEl.textContent = '';
-        if (Storage.hasUser()) {
-          this._enterApp();
-        } else {
-          this._showScreen('screenWelcome');
-        }
-      } else {
-        errorEl.textContent = 'Senha incorreta. Tente novamente.';
+      const result = await Auth.redeemAccessCode(input.value);
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Entrar no desafio';
+
+      if (!result.ok) {
+        errorEl.textContent = result.error;
         input.value = '';
         input.focus();
+        return;
       }
+
+      await this._syncAndEnter();
     });
+
+    adminToggle.addEventListener('click', () => this._showScreen('screenAdminLogin'));
+  },
+
+  /* ---------- Tela de login admin ---------- */
+  _bindAdminLoginScreen() {
+    const form = document.getElementById('adminLoginForm');
+    const input = document.getElementById('adminCodeInput');
+    const errorEl = document.getElementById('adminLoginError');
+    const backToggle = document.getElementById('adminBackToggle');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.textContent = '';
+
+      const result = await Auth.adminLogin(input.value);
+
+      if (!result.ok) {
+        errorEl.textContent = result.error;
+        input.value = '';
+        input.focus();
+        return;
+      }
+
+      await this._syncAndEnter();
+    });
+
+    backToggle.addEventListener('click', () => this._showScreen('screenAuth'));
   },
 
   /* ---------- Tela de boas-vindas (onboarding) ---------- */
@@ -136,10 +200,13 @@ const App = {
     const form = document.getElementById('welcomeForm');
     const input = document.getElementById('welcomeNameInput');
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = input.value.trim();
       if (!name) return;
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
 
       const user = {
         name,
@@ -147,10 +214,67 @@ const App = {
         completionShown: false,
       };
 
-      Storage.saveUser(user);
-      Toast.show(`Bem-vindo, ${name}!`, 'success');
+      const result = await Storage.saveUser(user);
+      submitBtn.disabled = false;
+
+      if (result.ok) {
+        Toast.show(`Bem-vindo, ${name}!`, 'success');
+      } else {
+        Toast.show('Salvo neste dispositivo. Sincronizando assim que a internet voltar.', 'error');
+      }
+
       this._enterApp();
     });
+  },
+
+  /* ---------- Sair da conta ---------- */
+  _bindSignOut() {
+    const btn = document.getElementById('signOutBtn');
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
+      await Auth.signOut();
+      document.getElementById('authCodeInput').value = '';
+      document.getElementById('authError').textContent = '';
+      this._showScreen('screenAuth');
+    });
+  },
+
+  /* ---------- Status de sincronização ---------- */
+  renderSyncStatus() {
+    const el = document.getElementById('syncStatus');
+    if (!el) return;
+
+    if (!navigator.onLine) {
+      el.textContent = '⚠ Salvo neste dispositivo — sincronização pendente';
+      el.classList.add('sync-status--pending');
+      return;
+    }
+
+    if (Storage.hasPendingSync()) {
+      el.textContent = '⚠ Sincronização pendente';
+      el.classList.add('sync-status--pending');
+    } else {
+      el.textContent = '✓ Progresso salvo na nuvem';
+      el.classList.remove('sync-status--pending');
+    }
+  },
+
+  /* ---------- Conectividade (sync automático ao voltar online) ---------- */
+  _bindConnectivity() {
+    window.addEventListener('online', async () => {
+      if (!Auth.isAuthenticated()) return;
+      const result = await Storage.syncPending();
+      this.renderSyncStatus();
+      if (result && result.ok) {
+        Toast.show('Dados sincronizados com sucesso.', 'success');
+        Dashboard.render();
+        Progress.render();
+        History.render();
+      }
+    });
+
+    window.addEventListener('offline', () => this.renderSyncStatus());
   },
 
   /* ---------- Navegação entre views ---------- */
@@ -181,6 +305,7 @@ const App = {
       history: 'Histórico',
       progress: 'Progresso',
       guide: 'Guia Completo',
+      admin: 'Painel administrativo',
     };
     const headerTitleEl = document.getElementById('appHeaderTitle');
     if (headerTitleEl) headerTitleEl.textContent = headerTitles[viewName] || '';
@@ -189,6 +314,7 @@ const App = {
 
     if (viewName === 'history') History.render();
     if (viewName === 'progress') Progress.render();
+    if (viewName === 'admin') AdminPanel.onEnter();
   },
 
   _handleAction(action) {
@@ -237,7 +363,7 @@ const App = {
     document.getElementById('calculatorOverlay').classList.remove('is-visible');
   },
 
-  _submitCalculator() {
+  async _submitCalculator() {
     const sexGroup = document.querySelector('[data-option-group="sex"]');
     const activityGroup = document.querySelector('[data-option-group="activity"]');
 
@@ -254,12 +380,19 @@ const App = {
     }
 
     const goals = Calculator.calculateGoals({ sex, age, weight, height, activityLevel });
-    Storage.saveGoals(goals);
+    const result = await Storage.saveGoals(goals);
 
     this._closeCalculatorModal();
-    Toast.show('Metas calculadas com sucesso!', 'success');
+
+    if (result.ok) {
+      Toast.show('Metas calculadas e salvas com sucesso!', 'success');
+    } else {
+      Toast.show('Metas calculadas. Salvas neste dispositivo — sincronização pendente.', 'error');
+    }
+
     Dashboard.render();
     Progress.render();
+    this.renderSyncStatus();
   },
 
   /* ---------- Tela de conclusão do desafio ---------- */

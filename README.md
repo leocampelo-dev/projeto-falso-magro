@@ -1,7 +1,14 @@
 # Projeto Falso Magro — 30 Dias
 
-Aplicação web (HTML + CSS + JS puro, sem frameworks e sem backend) para o desafio de 30 dias.
-Todos os dados ficam salvos no LocalStorage do próprio navegador do usuário.
+Aplicação web (HTML + CSS + JS puro, sem frameworks) para o desafio de 30 dias.
+
+**Arquitetura atual:** Vercel (hospedagem estática) + Supabase (Auth + PostgreSQL + Edge Functions).
+Cada cliente acessa com um **código individual** (não existe mais senha universal).
+Os dados são salvos oficialmente no Supabase e usam o LocalStorage apenas como
+cache local / fallback offline.
+
+👉 Para configurar o Supabase do zero (banco, Auth, secrets, Edge Functions),
+siga o guia completo em **[`SUPABASE_SETUP.md`](./SUPABASE_SETUP.md)**.
 
 ## Estrutura de arquivos
 
@@ -10,68 +17,55 @@ index.html
 vercel.json
 manifest.json
 service-worker.js
+
 assets/
   css/style.css
-  js/auth.js         → controle de senha de acesso
-  js/storage.js       → toda a leitura/escrita no LocalStorage
-  js/calculator.js    → cálculo de TMB, GET, calorias e macros
-  js/dashboard.js      → tela inicial (saudação, dia do desafio, metas)
-  js/checkin.js        → formulário de check-in diário
-  js/progress.js       → progresso (barra + grade de 30 dias) e histórico
-  js/app.js            → navegação, toasts, modal da calculadora, inicialização
-  icons/               → ícones do PWA
-pdf/guia.pdf            → guia completo (substitua pelo seu arquivo real)
+  js/
+    supabase-config.js  → SUPABASE_URL e chave pública (não contém secrets)
+    supabase-client.js  → único arquivo que fala com o Supabase (client + Edge Functions)
+    auth.js              → orquestra login por código (client e admin)
+    storage.js            → camada híbrida: Supabase (fonte oficial) + LocalStorage (cache)
+    calculator.js         → cálculo de TMB, GET, calorias e macros
+    dashboard.js           → tela inicial (saudação, checklist de passos)
+    checkin.js              → check-in diário
+    progress.js              → progresso, metas e histórico
+    admin.js                  → painel administrativo (gerar/gerenciar códigos)
+    app.js                     → navegação, autenticação, inicialização
+  icons/                        → ícones do PWA
+
+pdf/guia.pdf                     → guia completo (substitua pelo seu arquivo real)
+
+supabase/
+  migrations/0001_init.sql       → schema completo (rode no SQL Editor do Supabase)
+  functions/                     → Edge Functions (redeem-access-code, admin-login,
+                                    generate-access-code, admin-clients)
 ```
 
 ## Como publicar na Vercel
 
-1. Crie uma conta gratuita em https://vercel.com (pode entrar com GitHub, GitLab ou e-mail).
-2. Clique em **Add New → Project**.
-3. Escolha **"Deploy without Git"** (ou suba os arquivos para um repositório no GitHub e importe o repositório).
-4. Se for enviar os arquivos diretamente, arraste a pasta completa do projeto (mantendo a estrutura acima) para a área de upload.
-5. Não é necessário configurar Build Command nem Output Directory — é um site 100% estático. Deixe os campos em branco/padrão.
-6. Clique em **Deploy**. Em menos de um minuto sua aplicação estará no ar com uma URL gratuita (ex: `seu-projeto.vercel.app`).
-7. Se quiser um domínio próprio, adicione em **Project Settings → Domains**.
+1. Configure o Supabase primeiro — veja `SUPABASE_SETUP.md`.
+2. Preencha `assets/js/supabase-config.js` com a URL e a chave pública (anon) do seu projeto Supabase.
+3. Crie uma conta gratuita em vercel.com → **Add New → Project** → **Deploy without Git** → arraste a pasta do projeto → Deploy. Nenhuma configuração de build é necessária (site 100% estático).
 
-## Como alterar a senha de acesso
+## Como gerar o primeiro código de cliente
 
-Abra o arquivo `assets/js/auth.js` e altere esta linha:
-
-```js
-const APP_PASSWORD = 'FALSOMAGRO30';
-```
-
-Troque `FALSOMAGRO30` pela senha que você quiser entregar aos seus clientes. Salve o arquivo e publique novamente na Vercel.
+Depois de configurar o Supabase e publicar o app, entre com o código de administrador
+(botão "Acesso admin" na tela de login) e use o botão **+ Gerar novo código** dentro
+do Painel Administrativo. Veja o passo a passo completo em `SUPABASE_SETUP.md`.
 
 ## Como substituir o PDF do guia
 
-1. Coloque seu arquivo de guia definitivo na pasta `pdf/`.
-2. Renomeie-o para `guia.pdf` (substituindo o arquivo de exemplo) — ou, se preferir manter outro nome, ajuste a linha abaixo no arquivo `assets/js/app.js`:
-
-```js
-window.open('pdf/guia.pdf', '_blank', 'noopener');
-```
+Coloque seu arquivo de guia definitivo em `pdf/guia.pdf` (mesmo nome), substituindo o de exemplo.
 
 ## Como personalizar textos, cores e logotipo
 
-**Textos:** todos os textos ficam diretamente no `index.html`, escritos em português simples — basta editar o conteúdo entre as tags.
-
-**Cores:** todas as cores da aplicação estão centralizadas no topo do arquivo `assets/css/style.css`, dentro do bloco `:root`. Por exemplo:
-
-```css
---orange: #FF6A00;   → cor principal da marca
---black: #0D0D0D;    → fundo escuro / textos
-```
-
-Altere os valores hexadecimais para trocar a identidade visual em todo o app de uma vez.
-
-**Logotipo/ícone:** o emoji 🔥 é usado como marca dentro do app (splash, telas de login e cabeçalho da barra lateral) — basta trocar o emoji diretamente no `index.html` se quiser outro símbolo. Já os ícones do PWA (usados quando o usuário instala o app no celular) ficam em `assets/icons/icon-192.png` e `assets/icons/icon-512.png`; substitua esses arquivos por imagens quadradas nos mesmos tamanhos para trocar o ícone do aplicativo instalado.
+**Textos:** direto no `index.html`.
+**Cores:** centralizadas no topo de `assets/css/style.css`, bloco `:root` (ex: `--orange: #FF6A00;`).
+**Ícone do app instalado:** troque `assets/icons/icon-192.png` e `icon-512.png` por imagens quadradas do mesmo tamanho.
 
 ## Sobre a persistência de dados
 
-Como não há backend nem banco de dados, tudo é salvo com `localStorage` no navegador do próprio usuário. Isso significa que os dados:
-
-- Ficam somente naquele navegador/dispositivo.
-- São perdidos se o usuário limpar os dados do site ou trocar de aparelho.
-
-Essas informações já são explicadas para o usuário dentro do próprio app, na seção **Guia → Leia antes de começar**.
+O Supabase é a fonte oficial dos dados (protegida por Row Level Security — cada
+cliente só acessa os próprios dados). O LocalStorage funciona como cache: garante
+que o app abra instantaneamente e continue utilizável mesmo sem internet, sincronizando
+automaticamente assim que a conexão voltar.

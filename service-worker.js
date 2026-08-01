@@ -8,19 +8,22 @@
  * o navegador a buscar os arquivos novos.
  */
 
-const CACHE_NAME = 'falso-magro-v1';
+const CACHE_NAME = 'falso-magro-v2';
 
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './assets/css/style.css',
+  './assets/js/supabase-config.js',
+  './assets/js/supabase-client.js',
   './assets/js/storage.js',
   './assets/js/auth.js',
   './assets/js/calculator.js',
   './assets/js/dashboard.js',
   './assets/js/checkin.js',
   './assets/js/progress.js',
+  './assets/js/admin.js',
   './assets/js/app.js',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',

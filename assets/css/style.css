@@ -953,6 +953,15 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   min-height: 18px;
 }
 
+.auth-screen__admin-toggle {
+  margin-top: var(--space-6);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-400);
+  padding: 8px 12px;
+}
+.auth-screen__admin-toggle:active { opacity: 0.6; }
+
 .onboarding-steps {
   display: flex;
   gap: 6px;
@@ -1180,3 +1189,90 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
 @media (min-width: 900px) and (max-width: 1119px) {
   .content { max-width: 560px; }
 }
+
+/* ============================================================
+   STATUS DE SINCRONIZAÇÃO
+   ============================================================ */
+.sync-status {
+  margin-top: var(--space-3);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--success);
+}
+.sync-status--pending { color: #B8860B; }
+
+/* ============================================================
+   CONTA (sair / painel admin) — rodapé do Guia
+   ============================================================ */
+.guide-account-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+/* ============================================================
+   PAINEL ADMINISTRATIVO
+   ============================================================ */
+.admin-generated-card {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.admin-generated-card__label { font-size: 12px; color: var(--gray-600); }
+.admin-generated-card__code {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.admin-client-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--gray-200);
+}
+.admin-client-row:last-child { border-bottom: none; }
+
+.admin-client-row__main { flex: 1; min-width: 160px; }
+.admin-client-row__code {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13.5px;
+}
+.admin-client-row__meta {
+  font-size: 12px;
+  color: var(--gray-600);
+  margin-top: 2px;
+}
+
+.admin-client-row__status {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--gray-100);
+  color: var(--gray-600);
+  white-space: nowrap;
+}
+.admin-client-row__status--used { background: rgba(31,169,122,0.12); color: var(--success); }
+.admin-client-row__status--active { background: var(--orange-light); color: var(--orange-dark); }
+.admin-client-row__status--blocked { background: rgba(229,72,77,0.12); color: var(--danger); }
+.admin-client-row__status--expired { background: var(--gray-200); color: var(--gray-600); }
+
+.admin-client-row__actions {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+@media (min-width: 480px) {
+  .admin-client-row__actions { width: auto; }
+}
+
