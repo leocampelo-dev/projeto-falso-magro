@@ -3,7 +3,7 @@
 // Ações administrativas sobre clientes. Só pode ser chamada por um
 // usuário autenticado com app_metadata.role === "admin".
 //
-// Body esperado: { action: "list" | "block" | "reactivate" | "reset", ... }
+// Body esperado: { action: "list" | "block" | "reactivate" | "reset" | "delete", ... }
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
@@ -98,6 +98,48 @@ Deno.serve(async (req) => {
         .from("profiles")
         .update({ start_date: new Date().toISOString().slice(0, 10), completion_shown: false })
         .eq("id", accessCode.user_id);
+
+      return jsonResponse({ ok: true });
+    }
+
+    if (action === "delete") {
+      const accessCodeId = body?.accessCodeId;
+      const confirmed = body?.confirmed === true;
+
+      if (!accessCodeId) return jsonResponse({ error: "accessCodeId é obrigatório." }, 400);
+      if (!confirmed) {
+        return jsonResponse({ error: "É necessário confirmar explicitamente a exclusão (confirmed: true)." }, 400);
+      }
+
+      const { data: accessCode } = await supabaseAdmin
+        .from("access_codes")
+        .select("user_id")
+        .eq("id", accessCodeId)
+        .maybeSingle();
+
+      if (!accessCode) {
+        return jsonResponse({ error: "Código não encontrado." }, 404);
+      }
+
+      // Apagar o usuário do Auth já apaga em cascata profile, goals e checkins
+      // (todos referenciam auth.users(id) com "on delete cascade").
+      if (accessCode.user_id) {
+        const { error: deleteUserError } = await supabaseAdmin.auth.admin.deleteUser(accessCode.user_id);
+        if (deleteUserError) {
+          console.error("delete user failed", deleteUserError);
+          return jsonResponse({ error: "Não foi possível excluir os dados do cliente." }, 500);
+        }
+      }
+
+      const { error: deleteCodeError } = await supabaseAdmin
+        .from("access_codes")
+        .delete()
+        .eq("id", accessCodeId);
+
+      if (deleteCodeError) {
+        console.error("delete access_code failed", deleteCodeError);
+        return jsonResponse({ error: "Cliente removido, mas houve falha ao excluir o código." }, 500);
+      }
 
       return jsonResponse({ ok: true });
     }

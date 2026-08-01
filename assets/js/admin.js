@@ -106,6 +106,7 @@ const AdminPanel = {
             : `<button type="button" class="btn btn--secondary btn--sm" data-admin-action="block">Bloquear</button>`
           }
           <button type="button" class="btn btn--ghost btn--sm" data-admin-action="reset">Resetar progresso</button>
+          <button type="button" class="btn btn--danger btn--sm" data-admin-action="delete">Excluir</button>
         </div>
       </div>
     `;
@@ -137,6 +138,19 @@ const AdminPanel = {
 
         await SupabaseClient.adminResetClient(accessCodeId);
         Toast.show('Progresso resetado.', 'success');
+        this._loadClients();
+        return;
+      }
+
+      if (action === 'delete') {
+        const firstConfirm = window.confirm('Tem certeza que deseja excluir este cliente permanentemente? Todos os dados dele (nome, metas e check-ins) serão apagados.');
+        if (!firstConfirm) return;
+
+        const secondConfirm = window.confirm('Confirmação final: esta ação NÃO pode ser desfeita. Deseja realmente excluir este cliente?');
+        if (!secondConfirm) return;
+
+        await SupabaseClient.adminDeleteClient(accessCodeId);
+        Toast.show('Cliente excluído permanentemente.', 'success');
         this._loadClients();
       }
     } catch (err) {

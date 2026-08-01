@@ -157,4 +157,12 @@ const SupabaseClient = {
     if (error || !data || data.error) throw new Error((data && data.error) || 'Falha ao resetar progresso.');
     return true;
   },
+
+  async adminDeleteClient(accessCodeId) {
+    const { data, error } = await _client.functions.invoke('admin-clients', {
+      body: { action: 'delete', accessCodeId, confirmed: true },
+    });
+    if (error || !data || data.error) throw new Error((data && data.error) || 'Falha ao excluir cliente.');
+    return true;
+  },
 };
