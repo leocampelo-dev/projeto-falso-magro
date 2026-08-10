@@ -32,6 +32,7 @@ const CARDIO_TYPE_OPTIONS = [
 const Onboarding = {
   _active: false,
   _step: 1,
+  _expandedDiet: null,
   _draft: {
     selectedDiet: null,
     selectedWorkout: null,
@@ -62,6 +63,7 @@ const Onboarding = {
     };
 
     this._active = true;
+    this._expandedDiet = null;
     // Se o usuário já tem metas calculadas (ex: usuário antigo), pula o Passo 1.
     this._step = Storage.hasGoals() ? 2 : 1;
 
@@ -214,16 +216,29 @@ const Onboarding = {
       const macros = this._dietMacros(kcal);
       const isSelected = this._draft.selectedDiet === String(kcal);
       const isRecommended = kcal === recommended;
+      const isExpanded = this._expandedDiet === kcal;
+      const model = DietModels.get(kcal);
+
       return `
-        <button type="button" class="plan-option ${isSelected ? 'is-selected' : ''}" data-diet="${kcal}">
-          ${isRecommended ? '<span class="plan-option__badge">⭐ Recomendado para você</span>' : ''}
-          <div class="plan-option__title">${isSelected ? '✓ ' : ''}${kcal} kcal</div>
-          <div class="plan-option__macros">
-            <span>Proteína: ${macros.proteinG}g</span>
-            <span>Carboidratos: ${macros.carbsG}g</span>
-            <span>Gorduras: ${macros.fatG}g</span>
-          </div>
-        </button>
+        <div class="plan-option-wrap">
+          <button type="button" class="plan-option ${isSelected ? 'is-selected' : ''}" data-diet="${kcal}">
+            ${isRecommended ? '<span class="plan-option__badge">⭐ Recomendado para você</span>' : ''}
+            <div class="plan-option__title">${isSelected ? '✓ ' : ''}${kcal} kcal</div>
+            <div class="plan-option__macros">
+              <span>Proteína: ${macros.proteinG}g</span>
+              <span>Carboidratos: ${macros.carbsG}g</span>
+              <span>Gorduras: ${macros.fatG}g</span>
+            </div>
+          </button>
+          ${model ? `
+            <button type="button" class="plan-option__toggle" data-diet-toggle="${kcal}">
+              ${isExpanded ? '▲ Ocultar modelo' : '▼ Ver modelo'}
+            </button>
+            <div class="plan-option__details" style="display:${isExpanded ? '' : 'none'};">
+              ${this._renderDietModel(model)}
+            </div>
+          ` : ''}
+        </div>
       `;
     }).join('');
 
@@ -233,6 +248,45 @@ const Onboarding = {
         this._renderStep2();
       });
     });
+
+    wrap.querySelectorAll('[data-diet-toggle]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const kcal = Number(btn.dataset.dietToggle);
+        this._expandedDiet = this._expandedDiet === kcal ? null : kcal;
+        this._renderStep2();
+      });
+    });
+  },
+
+  /** Monta o HTML das refeições + substituições, reaproveitando o mesmo
+   *  estilo de linha (guide-table__row) já usado no Guia. */
+  _renderDietModel(model) {
+    const mealsHtml = model.meals.map((meal) => `
+      <div class="onb-meal-block">
+        <div class="onb-meal-block__title">${meal.title}</div>
+        ${meal.items.map((item) => `
+          <div class="guide-table__row">
+            <span class="guide-table__food">${item.food}</span>
+            <span class="guide-table__qty">${item.qty}</span>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+
+    const subsHtml = DietModels.substitutions.map((s) => `
+      <div class="guide-table__row">
+        <span class="guide-table__food">${s.group}</span>
+        <span class="guide-table__measure">${s.items}</span>
+      </div>
+    `).join('');
+
+    return `
+      ${mealsHtml}
+      <div class="onb-meal-block">
+        <div class="onb-meal-block__title">Substituições</div>
+        ${subsHtml}
+      </div>
+    `;
   },
 
   _renderStep3() {
@@ -319,6 +373,16 @@ const Onboarding = {
     const btn = document.getElementById('onbFinishBtn');
     btn.disabled = true;
 
+    // [NOVO] mini-loading divertido ao "montar" o projeto
+    await MiniLoader.show(
+      [
+        'Disponibilizando seu treino para ficar com o físico atlético 💪',
+        'Configurando seu cardio ❤️',
+        'Preparando seu projeto de 30 dias 🚀',
+      ],
+      1800
+    );
+
     const result = await Storage.saveProjectConfig({
       selectedDiet: this._draft.selectedDiet,
       selectedWorkout: this._draft.selectedWorkout,
@@ -329,6 +393,7 @@ const Onboarding = {
       projectConfigured: true,
     });
 
+    MiniLoader.hide();
     btn.disabled = false;
     this._active = false;
 

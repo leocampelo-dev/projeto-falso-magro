@@ -435,9 +435,20 @@ const App = {
       return;
     }
 
+    // [NOVO] mini-loading divertido enquanto "calcula"
+    await MiniLoader.show(
+      [
+        'Calculando sua estimativa calórica 🔥',
+        'Ajustando suas proteínas e carboidratos 📊',
+        'Quase lá...',
+      ],
+      1600
+    );
+
     const goals = Calculator.calculateGoals({ sex, age, weight, height, activityLevel });
     const result = await Storage.saveGoals(goals);
 
+    MiniLoader.hide();
     this._closeCalculatorModal();
 
     if (result.ok) {
