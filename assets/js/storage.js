@@ -9,6 +9,15 @@
  * resto do app): getUser/saveUser/hasUser, getGoals/saveGoals/hasGoals,
  * getCheckins/saveCheckin/getCheckinByDateKey/getLastCheckin.
  *
+ * NOVO (Falso Magro 30D — projeto personalizado):
+ *   O objeto "user" agora também guarda a configuração do projeto
+ *   (selectedDiet, selectedWorkout, cardioDays, cardioMinutes, cardioType,
+ *   cardioCustomType, projectConfigured). Isso reaproveita o MESMO mecanismo
+ *   de sync/offline que já existia para nome/data de início — nenhuma tabela
+ *   nova foi criada, só colunas novas na tabela de perfil (ver migration
+ *   0002_project_config.sql).
+ *   Novas funções: hasProjectConfigured() e saveProjectConfig(partial).
+ *
  * Leituras (getUser, getGoals, getCheckins etc.) continuam SÍNCRONAS: leem do cache local, que é
  * sincronizado com o Supabase uma vez no boot do app (Storage.syncFromRemote).
  * Escritas (saveUser, saveGoals, saveCheckin) são ASSÍNCRONAS: tentam gravar no Supabase primeiro;
@@ -160,6 +169,13 @@ const Storage = {
       name: row.name,
       startDate: row.start_date,
       completionShown: !!row.completion_shown,
+      selectedDiet: row.selected_diet || null,
+      selectedWorkout: row.selected_workout || null,
+      cardioDays: row.cardio_days || null,
+      cardioMinutes: row.cardio_minutes || null,
+      cardioType: row.cardio_type || null,
+      cardioCustomType: row.cardio_custom_type || '',
+      projectConfigured: !!row.project_configured,
     };
   },
   _userToDb(user) {
@@ -167,6 +183,13 @@ const Storage = {
       name: user.name,
       start_date: user.startDate,
       completion_shown: !!user.completionShown,
+      selected_diet: user.selectedDiet || null,
+      selected_workout: user.selectedWorkout || null,
+      cardio_days: user.cardioDays || null,
+      cardio_minutes: user.cardioMinutes || null,
+      cardio_type: user.cardioType || null,
+      cardio_custom_type: user.cardioCustomType || null,
+      project_configured: !!user.projectConfigured,
     };
   },
 
@@ -255,6 +278,24 @@ const Storage = {
       this._setPending(pending);
       return { ok: false, offline: true };
     }
+  },
+
+  /* ---------- Projeto personalizado (dieta / treino / cardio) ---------- */
+  /** true assim que o usuário concluiu o assistente de 4 passos pelo menos uma vez. */
+  hasProjectConfigured() {
+    const user = this.getUser();
+    return !!(user && user.projectConfigured);
+  },
+
+  /**
+   * Atualiza só os campos do projeto, preservando o resto do perfil
+   * (nome, data de início, etc.) e reaproveitando o mesmo saveUser/sync
+   * já existente. Usado pelo onboarding e, depois, pelos botões "Alterar".
+   */
+  async saveProjectConfig(partial) {
+    const user = this.getUser() || {};
+    const updated = { ...user, ...partial };
+    return this.saveUser(updated);
   },
 
   /* ---------- Metas calculadas ---------- */

@@ -122,6 +122,130 @@
       </div>
     </div>
   </section>
+  <!-- ============================================================
+     TELA: MONTAGEM DO PROJETO (ONBOARDING 4 PASSOS)
+     Cole este bloco INTEIRO logo depois de </section> que fecha
+     a <section id="screenWelcome" ...> e ANTES de
+     <section id="screenComplete" ...> no seu index.html.
+     ============================================================ -->
+<section id="screenOnboarding" class="screen">
+  <div class="onb-screen">
+    <div class="onb-header">
+      <button type="button" id="onbBackBtn" class="onb-header__back" aria-label="Voltar">←</button>
+      <span class="onb-header__label" id="onbStepLabel">PASSO 1 DE 4</span>
+    </div>
+
+    <div class="onb-body">
+
+      <!-- PASSO 1 — CALCULADORA -->
+      <div id="onbStep1" class="onb-step is-active">
+        <h1 class="onb-title">🔥 Sua estimativa calórica</h1>
+        <p class="onb-sub">Vamos descobrir sua meta calórica antes de montar o resto do seu projeto.</p>
+
+        <div id="onbStep1Empty">
+          <div class="card">
+            <p style="font-size:14px; color:var(--gray-600); margin-bottom:16px;">Informe idade, peso, altura e nível de atividade para calcular suas metas.</p>
+            <button type="button" class="btn btn--primary" id="onbOpenCalcBtn">Calcular minhas metas</button>
+          </div>
+        </div>
+
+        <div id="onbStep1Done" style="display:none;">
+          <div class="goal-grid">
+            <div class="goal-card">
+              <div class="goal-card__icon">🔥</div>
+              <div class="goal-card__value" id="onbCaloriesResult">—</div>
+              <div class="goal-card__label">Meta diária</div>
+            </div>
+            <div class="goal-card">
+              <div class="goal-card__icon">🥩</div>
+              <div class="goal-card__value" id="onbProteinResult">—</div>
+              <div class="goal-card__label">Proteína</div>
+            </div>
+            <div class="goal-card">
+              <div class="goal-card__icon">🍚</div>
+              <div class="goal-card__value" id="onbCarbsResult">—</div>
+              <div class="goal-card__label">Carboidratos</div>
+            </div>
+            <div class="goal-card">
+              <div class="goal-card__icon">🥑</div>
+              <div class="goal-card__value" id="onbFatResult">—</div>
+              <div class="goal-card__label">Gorduras</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <button type="button" class="btn btn--secondary" onclick="App._openCalculatorModal()">Recalcular</button>
+          </div>
+          <button type="button" class="btn btn--primary onb-cta" id="onbStep1ContinueBtn">👉 Montar meu projeto</button>
+        </div>
+      </div>
+
+        <!-- PASSO 2 — DIETA -->
+        <div id="onbStep2" class="onb-step">
+          <h1 class="onb-title">🍽️ Escolha sua alimentação</h1>
+          <p class="onb-sub">A calculadora indica sua necessidade estimada. Escolha o modelo mais adequado à sua estratégia. Em caso de dúvida, siga a opção recomendada.</p>
+          <div id="onbDietOptions"></div>
+          <button type="button" class="btn btn--primary onb-cta" id="onbStep2ContinueBtn">Continuar</button>
+        </div>
+
+        <!-- PASSO 3 — TREINO -->
+        <div id="onbStep3" class="onb-step">
+          <h1 class="onb-title">🏋️ Escolha seu treino</h1>
+          <p class="onb-sub">Quantos dias por semana você consegue treinar?</p>
+          <div id="onbWorkoutOptions"></div>
+          <button type="button" class="btn btn--primary onb-cta" id="onbStep3ContinueBtn">Continuar</button>
+        </div>
+
+        <!-- PASSO 4 — CARDIO -->
+        <div id="onbStep4" class="onb-step">
+          <h1 class="onb-title">❤️ Configure seu cardio</h1>
+          <p class="onb-sub">Defina dias, duração e tipo de cardio.</p>
+
+          <div class="field__label" style="margin-bottom:8px;">Quantos dias por semana?</div>
+          <div class="onb-chip-group" id="onbCardioDays"></div>
+
+          <div class="field__label" style="margin-bottom:8px;">Quanto tempo por sessão?</div>
+          <div class="onb-chip-group" id="onbCardioMinutes"></div>
+
+          <div class="field__label" style="margin-bottom:8px;">Tipo de cardio</div>
+          <div class="onb-chip-group" id="onbCardioType"></div>
+
+          <div id="onbCardioCustomWrap" class="field" style="display:none;">
+            <input id="onbCardioCustomType" class="input" type="text" placeholder="Qual? Ex: Natação" />
+          </div>
+
+          <div id="onbCardioVolume" class="onb-cardio-volume" style="display:none;"></div>
+
+          <button type="button" class="btn btn--primary onb-cta" id="onbStep4ContinueBtn">Continuar</button>
+        </div>
+
+        <!-- PASSO 5 — RESUMO -->
+        <div id="onbStep5" class="onb-step">
+          <h1 class="onb-title">🔥 Seu projeto está pronto</h1>
+          <p class="onb-sub">Confira o resumo antes de começar seus 30 dias.</p>
+
+          <div class="onb-summary-card">
+            <div class="onb-summary-card__label">🍽️ Alimentação</div>
+            <div class="onb-summary-card__value" id="onbSummaryDiet">—</div>
+          </div>
+          <div class="onb-summary-card">
+            <div class="onb-summary-card__label">🏋️ Treino</div>
+            <div class="onb-summary-card__value" id="onbSummaryWorkout">—</div>
+          </div>
+          <div class="onb-summary-card">
+            <div class="onb-summary-card__label">❤️ Cardio</div>
+            <div class="onb-summary-card__value" id="onbSummaryCardio">—</div>
+          </div>
+          <div class="onb-summary-card">
+            <div class="onb-summary-card__label">📅 Duração</div>
+            <div class="onb-summary-card__value">30 dias</div>
+          </div>
+
+          <button type="button" class="btn btn--primary onb-cta" id="onbFinishBtn">🚀 Começar meu projeto</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
 
   <!-- ============================================================
        TELA: DESAFIO CONCLUÍDO
@@ -646,6 +770,8 @@
 <script src="assets/js/progress.js"></script>
 <script src="assets/js/guide-content.js"></script>
 <script src="assets/js/admin.js"></script>
+<script src="assets/js/onboarding.js"></script>
 <script src="assets/js/app.js"></script>
+
 </body>
 </html>

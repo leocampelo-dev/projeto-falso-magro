@@ -73,6 +73,7 @@ const App = {
     this._bindAuthScreen();
     this._bindAdminLoginScreen();
     this._bindWelcomeScreen();
+    Onboarding.init(); // [NOVO] assistente de 4 passos
     this._bindCalculatorModal();
     this._bindSignOut();
     this._bindConnectivity();
@@ -119,6 +120,13 @@ const App = {
       return;
     }
 
+    // [NOVO] Usuário já tem conta, mas ainda não configurou o projeto
+    // (novo usuário logo após o nome, ou usuário antigo antes desta atualização).
+    if (!Storage.hasProjectConfigured()) {
+      Onboarding.start();
+      return;
+    }
+
     this._enterApp();
   },
 
@@ -144,6 +152,11 @@ const App = {
     History.render();
     Checkin.refreshTodayState();
     this.renderSyncStatus();
+  },
+
+  /** [NOVO] Chamado pelo onboarding.js ao finalizar o assistente de 4 passos. */
+  completeOnboarding() {
+    this._enterApp();
   },
 
   _applyAdminVisibility() {
@@ -212,7 +225,7 @@ const App = {
     backToggle.addEventListener('click', () => this._showScreen('screenAuth'));
   },
 
-  /* ---------- Tela de boas-vindas (onboarding) ---------- */
+  /* ---------- Tela de boas-vindas (onboarding: nome) ---------- */
   _bindWelcomeScreen() {
     const form = document.getElementById('welcomeForm');
     const input = document.getElementById('welcomeNameInput');
@@ -240,7 +253,8 @@ const App = {
         Toast.show('Salvo neste dispositivo. Sincronizando assim que a internet voltar.', 'error');
       }
 
-      this._enterApp();
+      // [NOVO] Antes ia direto para _enterApp(); agora entra no assistente de 4 passos.
+      Onboarding.start();
     });
   },
 
@@ -435,6 +449,12 @@ const App = {
     Dashboard.render();
     Progress.render();
     this.renderSyncStatus();
+
+    // [NOVO] Se a calculadora foi aberta de dentro do assistente (Passo 1),
+    // avança automaticamente para o Passo 2 em vez de só fechar o modal.
+    if (Onboarding.isActive()) {
+      Onboarding.onGoalsSaved(goals);
+    }
   },
 
   /* ---------- Tela de conclusão do desafio ---------- */
