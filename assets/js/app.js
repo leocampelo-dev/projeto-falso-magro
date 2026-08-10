@@ -120,6 +120,11 @@ const App = {
       return;
     }
 
+    if (Auth.isAdmin()) {
+      this._enterApp();
+      return;
+    }
+
     // [NOVO] Usuário já tem conta, mas ainda não configurou o projeto
     // (novo usuário logo após o nome, ou usuário antigo antes desta atualização).
     if (!Storage.hasProjectConfigured()) {
