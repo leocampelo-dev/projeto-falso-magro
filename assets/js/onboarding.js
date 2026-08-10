@@ -69,10 +69,13 @@ const Onboarding = {
     this._renderStep();
   },
 
-  /** Chamado pelo app.js quando a calculadora (modal) é salva durante o onboarding. */
+  /** Chamado pelo app.js quando a calculadora (modal) é salva durante o onboarding.
+   *  IMPORTANTE: não avança automaticamente — fica no Passo 1 mostrando o
+   *  resultado (calorias/macros) e só avança quando a pessoa clicar em
+   *  "Montar meu projeto". */
   onGoalsSaved() {
     if (!this._active) return;
-    this._step = 2;
+    this._step = 1;
     this._renderStep();
   },
 
@@ -142,7 +145,25 @@ const Onboarding = {
     if (this._step === 4) this._renderStep4();
     if (this._step === 5) this._renderStep5();
 
+    this._renderCalorieReminder();
+
     window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+  },
+
+  /** Lembrete fixo da meta calórica, visível a partir do Passo 2 (no Passo 1
+   *  o resultado completo já aparece no card, então o lembrete fica escondido
+   *  pra não repetir a mesma informação duas vezes). */
+  _renderCalorieReminder() {
+    const reminder = document.getElementById('onbCalorieReminder');
+    if (!reminder) return;
+
+    const goals = Storage.getGoals();
+    if (this._step >= 2 && goals) {
+      reminder.textContent = `🔥 Sua meta: ${goals.calories} kcal/dia`;
+      reminder.style.display = '';
+    } else {
+      reminder.style.display = 'none';
+    }
   },
 
   _renderStep1() {
