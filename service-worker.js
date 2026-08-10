@@ -8,7 +8,7 @@
  * o navegador a buscar os arquivos novos.
  */
 
-const CACHE_NAME = 'falso-magro-v3';
+const CACHE_NAME = 'falso-magro-v4';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -23,6 +23,10 @@ const ASSETS_TO_CACHE = [
   './assets/js/dashboard.js',
   './assets/js/checkin.js',
   './assets/js/progress.js',
+  './assets/js/guide-content.js',
+  './assets/js/diet-models.js',
+  './assets/js/mini-loader.js',
+  './assets/js/onboarding.js',
   './assets/js/admin.js',
   './assets/js/app.js',
   './assets/icons/icon-192.png',
