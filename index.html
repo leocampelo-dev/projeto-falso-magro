@@ -462,6 +462,32 @@
                 <li>Exemplos de treino</li>
                 <li>Dicas para acelerar resultados</li>
               </ul>
+              <h2 class="section-title">Exemplos rápidos</h2>
+
+            <div class="guide-toggle" id="guideContentToggle">
+              <button type="button" class="option-chip is-selected" data-value="dieta">🍽️ Dieta</button>
+              <button type="button" class="option-chip" data-value="treino">💪 Treino</button>
+            </div>
+
+            <div id="guideDietPanel">
+              <div class="guide-toggle" id="guideDietToggle">
+                <button type="button" class="option-chip is-selected" data-value="1">Dia simples</button>
+                <button type="button" class="option-chip" data-value="2">Rotina corrida</button>
+              </div>
+              <div id="guideDietContent"></div>
+            </div>
+
+            <div id="guideTreinoPanel" style="display:none;">
+              <div class="guide-toggle" id="guideTreinoToggle">
+                <button type="button" class="option-chip is-selected" data-value="3x">3x</button>
+                <button type="button" class="option-chip" data-value="4x">4x</button>
+                <button type="button" class="option-chip" data-value="5x">5x</button>
+                <button type="button" class="option-chip" data-value="6x">6x</button>
+                <button type="button" class="option-chip" data-value="casa">Em casa</button>
+                <button type="button" class="option-chip" data-value="cardio">Cardio</button>
+              </div>
+              <div id="guideTreinoContent"></div>
+            </div>
             </div>
 
             <div class="card" style="display:flex; align-items:center; justify-content:space-between; flex-direction:row; gap:16px; margin-top:16px;">
@@ -618,6 +644,7 @@
 <script src="assets/js/dashboard.js"></script>
 <script src="assets/js/checkin.js"></script>
 <script src="assets/js/progress.js"></script>
+<script src="assets/js/guide-content.js"></script>
 <script src="assets/js/admin.js"></script>
 <script src="assets/js/app.js"></script>
 </body>

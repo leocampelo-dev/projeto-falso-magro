@@ -69,6 +69,7 @@ const App = {
   init() {
     Toast.init();
     this._bindNav();
+    GuideContent.init();
     this._bindAuthScreen();
     this._bindAdminLoginScreen();
     this._bindWelcomeScreen();
@@ -355,6 +356,7 @@ const App = {
     if (viewName === 'checkin') Checkin.refreshTodayState();
     if (viewName === 'progress') Progress.render();
     if (viewName === 'admin') AdminPanel.onEnter();
+    if (viewName === 'guide') GuideContent.render();
   },
 
   _handleAction(action) {

@@ -1300,3 +1300,49 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   .admin-client-row__actions { width: auto; }
 }
 
+
+/* ============================================================
+   GUIA — EXEMPLOS DE DIETA E TREINO
+   ============================================================ */
+
+.guide-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+.guide-toggle .option-chip {
+  flex: 1 1 auto;
+  min-width: 72px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.guide-table__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+.guide-table__row:last-child { border-bottom: none; }
+
+.guide-table__food {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-900);
+  flex: 1;
+}
+.guide-table__qty {
+  font-size: 13px;
+  color: var(--gray-600);
+  white-space: nowrap;
+}
+.guide-table__measure {
+  font-size: 13px;
+  color: var(--gray-600);
+  text-align: right;
+  white-space: nowrap;
+}
+
