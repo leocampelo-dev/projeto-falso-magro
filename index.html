@@ -327,6 +327,79 @@
               </div>
             </div>
 
+            <!-- ==================== PROJETO: CABEÇALHO + PROGRESSO ==================== -->
+            <div class="card project-header-card">
+              <div class="project-header-card__title">🔥 PROJETO FALSO MAGRO 30D</div>
+              <div class="project-header-card__day" id="projectDayLabel">Dia 1 de 30</div>
+              <div class="project-progress-bar">
+                <div class="project-progress-bar__fill" id="projectProgressFill" style="width:0%;"></div>
+              </div>
+            </div>
+
+            <!-- ==================== SEU PLANO ==================== -->
+            <h2 class="section-title">🎯 Seu Plano</h2>
+
+            <div class="plan-card">
+              <div class="plan-card__head">
+                <span class="plan-card__icon">🍽️</span>
+                <span class="plan-card__title">Sua alimentação</span>
+              </div>
+              <div class="plan-card__value" id="planDietValue">—</div>
+              <div class="plan-card__macros" id="planDietMacros"></div>
+              <div class="plan-card__actions">
+                <button type="button" class="btn btn--secondary" id="planDietViewBtn">Ver alimentação</button>
+                <button type="button" class="btn btn--ghost" id="planDietChangeBtn">Alterar</button>
+              </div>
+              <div class="plan-card__details" id="planDietDetails" style="display:none;"></div>
+            </div>
+
+            <div class="plan-card">
+              <div class="plan-card__head">
+                <span class="plan-card__icon">🏋️</span>
+                <span class="plan-card__title">Seu treino</span>
+              </div>
+              <div class="plan-card__value" id="planWorkoutValue">—</div>
+              <div class="plan-card__actions">
+                <button type="button" class="btn btn--ghost" id="planWorkoutChangeBtn">Alterar</button>
+              </div>
+            </div>
+
+            <div class="plan-card">
+              <div class="plan-card__head">
+                <span class="plan-card__icon">❤️</span>
+                <span class="plan-card__title">Seu cardio</span>
+              </div>
+              <div class="plan-card__value" id="planCardioValue">—</div>
+              <div class="plan-card__actions">
+                <button type="button" class="btn btn--ghost" id="planCardioChangeBtn">Alterar</button>
+              </div>
+            </div>
+
+            <!-- ==================== HOJE ==================== -->
+            <h2 class="section-title">📋 Hoje</h2>
+
+            <div class="today-checklist">
+              <label class="today-checklist__item">
+                <input type="checkbox" id="todayCheckDiet" disabled>
+                <span>Seguir alimentação</span>
+              </label>
+              <label class="today-checklist__item">
+                <input type="checkbox" id="todayCheckWorkout" disabled>
+                <span>Fazer treino</span>
+              </label>
+              <label class="today-checklist__item">
+                <input type="checkbox" id="todayCheckCardio">
+                <span>Fazer cardio</span>
+              </label>
+              <label class="today-checklist__item">
+                <input type="checkbox" id="todayCheckCheckin" disabled>
+                <span>Fazer check-in</span>
+              </label>
+            </div>
+            <button type="button" class="btn btn--primary" data-nav-target="checkin" style="width:100%; margin-top:12px;">
+              Fazer check-in de hoje
+            </button>
+
             <!-- Comece por aqui: os passos -->
             <h2 class="section-title">Comece por aqui</h2>
 
@@ -772,7 +845,8 @@
 <script src="assets/js/progress.js"></script>
 <script src="assets/js/guide-content.js"></script>
 <script src="assets/js/admin.js"></script>
-<script src="assets/js/diet-models.js"></script>   <!-- NOVA LINHA -->
+<script src="assets/js/project-options.js"></script>
+<script src="assets/js/diet-models.js"></script>  
 <script src="assets/js/mini-loader.js"></script> 
 <script src="assets/js/onboarding.js"></script>
 <script src="assets/js/app.js"></script>
