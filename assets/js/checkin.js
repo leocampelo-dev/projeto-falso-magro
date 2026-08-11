@@ -9,6 +9,7 @@ const Checkin = {
     sleptWell: null,
     energy: null,
     nutrition: null,
+    didCardio: null,
   },
 
   init() {
@@ -23,6 +24,10 @@ const Checkin = {
 
     document.querySelectorAll('#view-checkin [data-toggle-group="sleptWell"] .toggle-btn').forEach((btn) => {
       btn.addEventListener('click', () => this._selectToggle('sleptWell', btn, 'sleptWellRow'));
+    });
+
+    document.querySelectorAll('#view-checkin [data-toggle-group="didCardio"] .toggle-btn').forEach((btn) => {
+      btn.addEventListener('click', () => this._selectToggle('didCardio', btn, 'didCardioRow'));
     });
 
     document.querySelectorAll('#energyScale .scale-dot').forEach((btn) => {
@@ -71,6 +76,10 @@ const Checkin = {
     if (existing.sleptWell !== null) {
       const btn = document.querySelector(`#sleptWellRow .toggle-btn[data-value="${existing.sleptWell ? 'sim' : 'nao'}"]`);
       if (btn) this._selectToggle('sleptWell', btn, 'sleptWellRow');
+    }
+    if (existing.didCardio !== null && existing.didCardio !== undefined) {
+      const btn = document.querySelector(`#didCardioRow .toggle-btn[data-value="${existing.didCardio ? 'sim' : 'nao'}"]`);
+      if (btn) this._selectToggle('didCardio', btn, 'didCardioRow');
     }
     if (existing.energy) {
       const dot = document.querySelector(`#energyScale .scale-dot[data-value="${existing.energy}"]`);
@@ -121,6 +130,7 @@ const Checkin = {
       sleptWell: this.state.sleptWell,
       energy: this.state.energy,
       nutrition: this.state.nutrition,
+      didCardio: this.state.didCardio,
       notes,
       savedAt: now.toISOString(),
     };

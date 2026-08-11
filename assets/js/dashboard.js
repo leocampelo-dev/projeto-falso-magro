@@ -1,9 +1,10 @@
 /**
  * dashboard.js
  * Renderiza a Home: saudação, cabeçalho do projeto (Dia X/30), "Seu Plano"
- * (dieta/treino/cardio com botão Alterar), checklist "Hoje" e o checklist
- * dinâmico de passos original. Metas, anel de progresso e estatísticas
- * completas ficam na aba Progresso (progress.js) — aqui é só o resumo do dia.
+ * (dieta/treino/cardio com botão Alterar), card de status "Hoje" (check-in
+ * feito/pendente + contador semanal de cardio) e o checklist dinâmico de
+ * passos original. Metas, anel de progresso e estatísticas completas ficam
+ * na aba Progresso (progress.js) — aqui é só o resumo do dia.
  */
 
 const CHALLENGE_LENGTH_DAYS = 30;
@@ -119,6 +120,29 @@ const Dashboard = {
       dietChangeBtn.addEventListener('click', () => Onboarding.startAt('diet'));
     }
 
+    // [NOVO] "Ver treino" — mesmo padrão do "Ver alimentação", reaproveitando
+    // o conteúdo de GUIDE_WORKOUTS (guide-content.js) via renderWorkoutHtml().
+    const workoutViewBtn = document.getElementById('planWorkoutViewBtn');
+    const workoutDetailsEl = document.getElementById('planWorkoutDetails');
+    if (workoutViewBtn && workoutDetailsEl && !workoutViewBtn.dataset.bound) {
+      workoutViewBtn.dataset.bound = 'true';
+      workoutViewBtn.addEventListener('click', () => {
+        const user = Storage.getUser();
+        if (!user || !user.selectedWorkout) return;
+
+        const isOpen = workoutDetailsEl.style.display !== 'none';
+        if (isOpen) {
+          workoutDetailsEl.style.display = 'none';
+          workoutViewBtn.textContent = 'Ver treino';
+          return;
+        }
+
+        workoutDetailsEl.innerHTML = GuideContent.renderWorkoutHtml(user.selectedWorkout);
+        workoutDetailsEl.style.display = '';
+        workoutViewBtn.textContent = 'Ocultar treino';
+      });
+    }
+
     const workoutChangeBtn = document.getElementById('planWorkoutChangeBtn');
     if (workoutChangeBtn && !workoutChangeBtn.dataset.bound) {
       workoutChangeBtn.dataset.bound = 'true';
@@ -133,41 +157,73 @@ const Dashboard = {
   },
 
   /**
-   * [NOVO] Seção "📋 Hoje". Três itens são reflexo automático do check-in de
-   * hoje (não são clicáveis — editar o check-in é sempre pela tela de
-   * check-in, fonte única da verdade). O item "Fazer cardio" é uma marcação
-   * simples salva só neste dispositivo (não existe campo de cardio no
-   * check-in hoje — dá pra promover isso a um campo de verdade numa fase
-   * futura, se fizer sentido pro produto).
+   * [REVISADO] Seção "📋 Hoje" — um único card de status, sem duplicar a aba
+   * Check-in. Tanto o check-in quanto o cardio agora são só leitura aqui:
+   * a aba Check-in é a fonte única da verdade pros dois (didCardio já é um
+   * campo real do check-in, sincronizado no Supabase — não fica mais preso
+   * a este dispositivo). O contador semanal de cardio é comparado com a meta
+   * (user.cardioDays) definida no onboarding.
    */
   _renderTodayChecklist() {
     const todayKey = Utils.getDateKey(new Date());
     const entry = Storage.getCheckinByDateKey(todayKey);
 
-    const dietBox = document.getElementById('todayCheckDiet');
-    const workoutBox = document.getElementById('todayCheckWorkout');
-    const checkinBox = document.getElementById('todayCheckCheckin');
-
-    if (dietBox) dietBox.checked = !!(entry && entry.nutrition);
-    if (workoutBox) workoutBox.checked = !!(entry && entry.trained === true);
-    if (checkinBox) checkinBox.checked = !!entry;
-
-    this._renderCardioCheck(todayKey);
+    this._renderCheckinStatus(entry);
+    this._renderCardioStatus(entry);
   },
 
-  _renderCardioCheck(todayKey) {
-    const checkbox = document.getElementById('todayCheckCardio');
-    if (!checkbox) return;
+  _renderCheckinStatus(entry) {
+    const icon = document.getElementById('todayCheckinIcon');
+    const hint = document.getElementById('todayCheckinHint');
+    const btn = document.getElementById('todayCheckinBtn');
+    const row = btn ? btn.closest('.today-status__row') : null;
 
-    const storageKey = `fm_cardio_done_${todayKey}`;
-    checkbox.checked = localStorage.getItem(storageKey) === '1';
+    const done = !!entry;
 
-    if (!checkbox.dataset.bound) {
-      checkbox.dataset.bound = 'true';
-      checkbox.addEventListener('change', () => {
-        localStorage.setItem(`fm_cardio_done_${Utils.getDateKey(new Date())}`, checkbox.checked ? '1' : '0');
-      });
+    if (icon) icon.textContent = done ? '✅' : '⭕';
+    if (row) row.classList.toggle('today-status__row--done', done);
+
+    if (hint) {
+      if (done) {
+        const time = new Date(entry.savedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        hint.textContent = `Feito às ${time}`;
+      } else {
+        hint.textContent = 'Ainda não feito';
+      }
     }
+
+    if (btn) btn.textContent = done ? 'Atualizar' : 'Fazer';
+  },
+
+  _cardioWeekKeys(referenceDate = new Date()) {
+    // Semana corrente (domingo a sábado) a partir da data de referência.
+    const start = new Date(referenceDate);
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - start.getDay());
+
+    const keys = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      keys.push(Utils.getDateKey(d));
+    }
+    return keys;
+  },
+
+  _renderCardioStatus(todayEntry) {
+    const icon = document.getElementById('todayCardioIcon');
+    const hint = document.getElementById('todayCardioHint');
+    if (!hint) return;
+
+    const user = Storage.getUser();
+    const goal = user && user.cardioDays ? user.cardioDays : null;
+
+    const weekKeys = this._cardioWeekKeys();
+    const checkins = Storage.getCheckins();
+    const doneCount = checkins.filter((c) => weekKeys.includes(c.dateKey) && c.didCardio === true).length;
+
+    if (icon) icon.textContent = todayEntry && todayEntry.didCardio === true ? '✅' : '⭕';
+    hint.textContent = goal ? `${doneCount} de ${goal}x essa semana` : `${doneCount}x essa semana`;
   },
 
   /** Passo 1 — Calcular metas: muda de visual assim que já existem metas salvas */

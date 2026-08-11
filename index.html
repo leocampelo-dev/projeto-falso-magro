@@ -317,16 +317,6 @@
               <p class="sync-status" id="syncStatus"></p>
             </div>
 
-            <!-- Vídeo de boas-vindas -->
-            <div class="card video-card">
-              <div class="video-card__title">Assista antes de começar</div>
-              <p class="video-card__sub">Este vídeo explica em menos de dois minutos como utilizar todo o sistema.</p>
-              <div class="video-placeholder">
-                <span class="video-placeholder__icon">▶️</span>
-                <span class="video-placeholder__label">Vídeo em breve</span>
-              </div>
-            </div>
-
             <!-- ==================== PROJETO: CABEÇALHO + PROGRESSO ==================== -->
             <div class="card project-header-card">
               <div class="project-header-card__title">🔥 PROJETO FALSO MAGRO 30D</div>
@@ -360,8 +350,10 @@
               </div>
               <div class="plan-card__value" id="planWorkoutValue">—</div>
               <div class="plan-card__actions">
+                <button type="button" class="btn btn--secondary" id="planWorkoutViewBtn">Ver treino</button>
                 <button type="button" class="btn btn--ghost" id="planWorkoutChangeBtn">Alterar</button>
               </div>
+              <div class="plan-card__details" id="planWorkoutDetails" style="display:none;"></div>
             </div>
 
             <div class="plan-card">
@@ -378,27 +370,24 @@
             <!-- ==================== HOJE ==================== -->
             <h2 class="section-title">📋 Hoje</h2>
 
-            <div class="today-checklist">
-              <label class="today-checklist__item">
-                <input type="checkbox" id="todayCheckDiet" disabled>
-                <span>Seguir alimentação</span>
-              </label>
-              <label class="today-checklist__item">
-                <input type="checkbox" id="todayCheckWorkout" disabled>
-                <span>Fazer treino</span>
-              </label>
-              <label class="today-checklist__item">
-                <input type="checkbox" id="todayCheckCardio">
-                <span>Fazer cardio</span>
-              </label>
-              <label class="today-checklist__item">
-                <input type="checkbox" id="todayCheckCheckin" disabled>
-                <span>Fazer check-in</span>
-              </label>
+            <div class="today-status">
+              <div class="today-status__row">
+                <span class="today-status__icon" id="todayCheckinIcon">⭕</span>
+                <div class="today-status__text">
+                  <span class="today-status__label">Check-in de hoje</span>
+                  <span class="today-status__hint" id="todayCheckinHint">Ainda não feito</span>
+                </div>
+                <button type="button" class="btn btn--primary btn--sm" data-nav-target="checkin" id="todayCheckinBtn">Fazer</button>
+              </div>
+
+              <div class="today-status__row">
+                <span class="today-status__icon" id="todayCardioIcon">⭕</span>
+                <div class="today-status__text">
+                  <span class="today-status__label">Cardio</span>
+                  <span class="today-status__hint" id="todayCardioHint">—</span>
+                </div>
+              </div>
             </div>
-            <button type="button" class="btn btn--primary" data-nav-target="checkin" style="width:100%; margin-top:12px;">
-              Fazer check-in de hoje
-            </button>
 
             <!-- Comece por aqui: os passos -->
             <h2 class="section-title">Comece por aqui</h2>
@@ -460,6 +449,14 @@
               <div class="field">
                 <label class="field__label">💪 Treinou hoje?</label>
                 <div class="toggle-row" id="trainedRow" data-toggle-group="trained">
+                  <button type="button" class="toggle-btn" data-value="sim">Sim</button>
+                  <button type="button" class="toggle-btn" data-value="nao">Não</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label">❤️ Fez cardio hoje?</label>
+                <div class="toggle-row" id="didCardioRow" data-toggle-group="didCardio">
                   <button type="button" class="toggle-btn" data-value="sim">Sim</button>
                   <button type="button" class="toggle-btn" data-value="nao">Não</button>
                 </div>

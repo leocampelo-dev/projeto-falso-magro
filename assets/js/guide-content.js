@@ -215,9 +215,19 @@ const GuideContent = {
   },
 
   _renderWorkout(key) {
-    const workout = GUIDE_WORKOUTS[key];
     const el = document.getElementById('guideTreinoContent');
-    if (!workout || !el) return;
+    if (!el) return;
+    el.innerHTML = this.renderWorkoutHtml(key);
+  },
+
+  /**
+   * [NOVO] Gera o HTML de um plano de treino a partir da chave (3x/4x/5x/
+   * 6x/casa/cardio). Extraído de _renderWorkout pra ser reaproveitado fora
+   * do Guia — usado pelo botão "Ver treino" da aba Meu Plano / Home.
+   */
+  renderWorkoutHtml(key) {
+    const workout = GUIDE_WORKOUTS[key];
+    if (!workout) return '<p>Treino não encontrado.</p>';
 
     let html = `<div class="card" style="margin-bottom:12px;">
       <div style="font-weight:700; font-family:var(--font-display);">${workout.label}</div>
@@ -256,6 +266,6 @@ const GuideContent = {
       html += `<div class="notice-card"><div class="notice-list__item">${workout.note}</div></div>`;
     }
 
-    el.innerHTML = html;
+    return html;
   },
 };

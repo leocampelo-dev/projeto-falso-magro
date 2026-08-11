@@ -230,6 +230,7 @@ const Storage = {
       sleptWell: row.slept_well,
       energy: row.energy,
       nutrition: row.nutrition,
+      didCardio: row.did_cardio,
       notes: row.notes,
       savedAt: row.saved_at,
     };
@@ -244,6 +245,7 @@ const Storage = {
       slept_well: entry.sleptWell,
       energy: entry.energy,
       nutrition: entry.nutrition,
+      did_cardio: entry.didCardio,
       notes: entry.notes,
       saved_at: entry.savedAt,
     };
