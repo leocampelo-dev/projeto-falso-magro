@@ -92,11 +92,6 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-
-  /* Exceção: o giro do mini-loader precisa continuar visível mesmo com
-     "reduzir movimento" ativado, senão ele fica travado/instantâneo e
-     parece bugado. O resto do site continua respeitando a preferência. */
-  .mini-loader__spinner { animation-duration: 2.0s !important; }
 }
 
 :focus-visible {
@@ -1109,25 +1104,12 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   max-width: 480px;
   border-radius: 28px 28px 0 0;
   padding: var(--space-5);
-  max-height: 94vh; /* era 86vh — reduz o espaço vazio acima e a necessidade de rolar */
+  max-height: 86vh;
   overflow-y: auto;
   transform: translateY(24px);
   transition: transform 0.3s var(--ease);
 }
 .modal-overlay.is-visible .modal-sheet { transform: translateY(0); }
-
-/* Telas maiores (tablet/desktop): modal centralizado em vez de bottom-sheet,
-   evita o vão vazio no topo em telas altas. */
-@media (min-width: 760px) {
-  .modal-overlay { align-items: center; padding: var(--space-5); }
-  .modal-sheet {
-    border-radius: var(--radius-md);
-    max-height: 88vh;
-    transform: translateY(12px) scale(0.98);
-  }
-  .modal-overlay.is-visible .modal-sheet { transform: translateY(0) scale(1); }
-  .modal-sheet__handle { display: none; } /* faz sentido só no gesto de "arrastar pra fechar" do mobile */
-}
 
 .modal-sheet__handle {
   width: 40px;
@@ -1139,7 +1121,6 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
 
 .modal-sheet__title { font-family: var(--font-display); font-size: 19px; font-weight: 700; }
 .modal-sheet__sub { font-size: 13px; color: var(--gray-600); margin-top: 4px; }
-
 
 /* ============================================================
    LOADING / SPLASH
@@ -1947,7 +1928,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   border: 4px solid var(--gray-200);
   border-top-color: var(--orange);
   border-radius: 50%;
-  animation: miniLoaderSpin 2.0s linear infinite;
+  animation: miniLoaderSpin 2.4s linear infinite;
 }
 @keyframes miniLoaderSpin {
   to { transform: rotate(360deg); }
@@ -1968,3 +1949,118 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   .onb-title { font-size: 26px; }
 }
  
+/* ============================================================
+   HOME PERSONALIZADA (Fase 5) — cabeçalho do projeto, Seu Plano, Hoje
+   ============================================================ */
+.project-header-card {
+  text-align: center;
+  padding: var(--space-5) var(--space-4);
+}
+.project-header-card__title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--gray-600);
+  margin-bottom: 4px;
+}
+.project-header-card__day {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: var(--space-3);
+}
+.project-progress-bar {
+  width: 100%;
+  height: 10px;
+  background: var(--gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.project-progress-bar__fill {
+  height: 100%;
+  background: var(--orange);
+  border-radius: var(--radius-full);
+  transition: width 0.4s var(--ease);
+}
+
+/* Cards do "Seu Plano" */
+.plan-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+.plan-card__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.plan-card__icon { font-size: 18px; }
+.plan-card__title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gray-600);
+}
+.plan-card__value {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.plan-card__macros {
+  font-size: 12.5px;
+  color: var(--gray-600);
+  margin-bottom: var(--space-3);
+}
+.plan-card__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.plan-card__actions .btn { flex: 1 1 auto; }
+.plan-card__details {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--gray-200);
+}
+
+.btn--ghost {
+  background: transparent;
+  border: 2px solid var(--gray-200);
+  color: var(--gray-600);
+  font-weight: 700;
+}
+.btn--ghost:active { background: var(--gray-100); }
+
+/* Checklist "Hoje" */
+.today-checklist {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.today-checklist__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px var(--space-4);
+  font-size: 14.5px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--gray-200);
+}
+.today-checklist__item:last-child { border-bottom: none; }
+.today-checklist__item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--orange);
+  flex-shrink: 0;
+}
+.today-checklist__item input[type="checkbox"]:checked + span {
+  text-decoration: line-through;
+  color: var(--gray-600);
+}

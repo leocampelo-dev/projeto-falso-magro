@@ -183,4 +183,39 @@ const DietModels = {
   get(kcal) {
     return this[kcal] || null;
   },
+
+  /**
+   * [NOVO — Fase 5] Monta o HTML das refeições + substituições de um modelo,
+   * reaproveitando o mesmo estilo de linha (guide-table__row) do Guia.
+   * Usado pelo onboarding (Passo 2) e pela Home ("Ver alimentação"), pra não
+   * duplicar essa marcação em dois arquivos.
+   */
+  renderHtml(model) {
+    const mealsHtml = model.meals.map((meal) => `
+      <div class="onb-meal-block">
+        <div class="onb-meal-block__title">${meal.title}</div>
+        ${meal.items.map((item) => `
+          <div class="guide-table__row">
+            <span class="guide-table__food">${item.food}</span>
+            <span class="guide-table__qty">${item.qty}</span>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+
+    const subsHtml = this.substitutions.map((s) => `
+      <div class="guide-table__row">
+        <span class="guide-table__food">${s.group}</span>
+        <span class="guide-table__measure">${s.items}</span>
+      </div>
+    `).join('');
+
+    return `
+      ${mealsHtml}
+      <div class="onb-meal-block">
+        <div class="onb-meal-block__title">Substituições</div>
+        ${subsHtml}
+      </div>
+    `;
+  },
 };

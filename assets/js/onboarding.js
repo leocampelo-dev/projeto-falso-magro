@@ -11,28 +11,11 @@
  * exatamente como o resto do app já usa.
  */
 
-const DIET_OPTIONS = [1600, 1800, 2000, 2200];
-
-const WORKOUT_OPTIONS = [
-  { value: '3x', label: '3x por semana', desc: 'Full Body' },
-  { value: '4x', label: '4x por semana', desc: 'Upper / Lower' },
-  { value: '5x', label: '5x por semana', desc: 'Hipertrofia' },
-];
-
-const CARDIO_DAY_OPTIONS = [3, 4, 5, 6, 7];
-const CARDIO_MINUTE_OPTIONS = [15, 20, 25, 30, 40];
-const CARDIO_TYPE_OPTIONS = [
-  { value: 'caminhada', label: 'Caminhada' },
-  { value: 'bicicleta', label: 'Bicicleta' },
-  { value: 'escada', label: 'Escada' },
-  { value: 'corrida', label: 'Corrida' },
-  { value: 'outro', label: 'Outro' },
-];
-
 const Onboarding = {
   _active: false,
   _step: 1,
   _expandedDiet: null,
+  _editingFromHome: false,
   _draft: {
     selectedDiet: null,
     selectedWorkout: null,
@@ -64,8 +47,36 @@ const Onboarding = {
 
     this._active = true;
     this._expandedDiet = null;
+    this._editingFromHome = false;
     // Se o usuário já tem metas calculadas (ex: usuário antigo), pula o Passo 1.
     this._step = Storage.hasGoals() ? 2 : 1;
+
+    App._showScreen('screenOnboarding');
+    this._renderStep();
+  },
+
+  /**
+   * [NOVO — Fase 5] Abre o assistente já no passo certo, chamado pelos
+   * botões "Alterar" da Home. Ao terminar, salva e volta pra Home — não
+   * mexe em check-ins, progresso ou histórico.
+   */
+  startAt(section) {
+    const user = Storage.getUser() || {};
+    this._draft = {
+      selectedDiet: user.selectedDiet || null,
+      selectedWorkout: user.selectedWorkout || null,
+      cardioDays: user.cardioDays || null,
+      cardioMinutes: user.cardioMinutes || null,
+      cardioType: user.cardioType || null,
+      cardioCustomType: user.cardioCustomType || '',
+    };
+
+    this._active = true;
+    this._expandedDiet = null;
+    this._editingFromHome = true;
+
+    const stepMap = { diet: 2, workout: 3, cardio: 4 };
+    this._step = stepMap[section] || 2;
 
     App._showScreen('screenOnboarding');
     this._renderStep();
@@ -186,17 +197,13 @@ const Onboarding = {
     }
   },
 
-  /** Recalcula macros para uma meta calórica fixa (1600/1800/2000/2200),
-   *  mantendo a proteína (g/kg) já calculada — a mesma lógica do calculator.js. */
+  /** Macros da meta calórica escolhida — delega pro Calculator (mesma lógica
+   *  usada na Home), passando a proteína já calculada do usuário. */
   _dietMacros(kcal) {
     const goals = Storage.getGoals();
     const proteinG = goals ? goals.protein : Math.round((kcal * 0.3) / 4);
-    const proteinKcal = proteinG * 4;
-    const fatKcal = kcal * 0.25;
-    const fatG = Math.round(fatKcal / 9);
-    const carbsKcal = Math.max(kcal - proteinKcal - fatKcal, 0);
-    const carbsG = Math.round(carbsKcal / 4);
-    return { proteinG, carbsG, fatG };
+    const macros = Calculator.calculateMacrosForTarget(kcal, proteinG);
+    return { proteinG: macros.protein, carbsG: macros.carbs, fatG: macros.fat };
   },
 
   _recommendedDiet() {
@@ -235,7 +242,7 @@ const Onboarding = {
               ${isExpanded ? '▲ Ocultar modelo' : '▼ Ver modelo'}
             </button>
             <div class="plan-option__details" style="display:${isExpanded ? '' : 'none'};">
-              ${this._renderDietModel(model)}
+              ${DietModels.renderHtml(model)}
             </div>
           ` : ''}
         </div>
@@ -256,37 +263,6 @@ const Onboarding = {
         this._renderStep2();
       });
     });
-  },
-
-  /** Monta o HTML das refeições + substituições, reaproveitando o mesmo
-   *  estilo de linha (guide-table__row) já usado no Guia. */
-  _renderDietModel(model) {
-    const mealsHtml = model.meals.map((meal) => `
-      <div class="onb-meal-block">
-        <div class="onb-meal-block__title">${meal.title}</div>
-        ${meal.items.map((item) => `
-          <div class="guide-table__row">
-            <span class="guide-table__food">${item.food}</span>
-            <span class="guide-table__qty">${item.qty}</span>
-          </div>
-        `).join('')}
-      </div>
-    `).join('');
-
-    const subsHtml = DietModels.substitutions.map((s) => `
-      <div class="guide-table__row">
-        <span class="guide-table__food">${s.group}</span>
-        <span class="guide-table__measure">${s.items}</span>
-      </div>
-    `).join('');
-
-    return `
-      ${mealsHtml}
-      <div class="onb-meal-block">
-        <div class="onb-meal-block__title">Substituições</div>
-        ${subsHtml}
-      </div>
-    `;
   },
 
   _renderStep3() {
@@ -367,6 +343,9 @@ const Onboarding = {
     const cardioTypeLabel = this._draft.cardioType === 'outro' ? (this._draft.cardioCustomType || 'Outro') : (typeOpt || {}).label;
     document.getElementById('onbSummaryCardio').textContent =
       `${this._draft.cardioDays}x/semana · ${this._draft.cardioMinutes} min · ${cardioTypeLabel || '—'}`;
+
+    const finishBtn = document.getElementById('onbFinishBtn');
+    if (finishBtn) finishBtn.textContent = this._editingFromHome ? '💾 Salvar alterações' : '🚀 Começar meu projeto';
   },
 
   async _finish() {
@@ -396,6 +375,7 @@ const Onboarding = {
     MiniLoader.hide();
     btn.disabled = false;
     this._active = false;
+    this._editingFromHome = false;
 
     if (result.ok) {
       Toast.show('Seu projeto foi configurado com sucesso!', 'success');

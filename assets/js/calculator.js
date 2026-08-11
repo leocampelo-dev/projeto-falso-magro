@@ -63,4 +63,19 @@ const Calculator = {
       calculatedAt: new Date().toISOString(),
     };
   },
+
+  /**
+   * [NOVO — Fase 2/5] Recalcula proteína/carbo/gordura para uma meta
+   * calórica fixa (os modelos de 1600/1800/2000/2200 kcal), mantendo a
+   * proteína (g/kg) já calculada para o usuário. Usado pelo onboarding
+   * (Passo 2) e pela Home ("Seu Plano") — não mexe nos cálculos acima.
+   */
+  calculateMacrosForTarget(targetCalories, proteinGrams) {
+    const proteinKcal = proteinGrams * 4;
+    const fatKcal = targetCalories * 0.25;
+    const fatGrams = Math.round(fatKcal / 9);
+    const carbsKcal = Math.max(targetCalories - proteinKcal - fatKcal, 0);
+    const carbsGrams = Math.round(carbsKcal / 4);
+    return { protein: proteinGrams, carbs: carbsGrams, fat: fatGrams };
+  },
 };
