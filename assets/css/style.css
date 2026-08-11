@@ -96,7 +96,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   /* Exceção: o giro do mini-loader precisa continuar visível mesmo com
      "reduzir movimento" ativado, senão ele fica travado/instantâneo e
      parece bugado. O resto do site continua respeitando a preferência. */
-  .mini-loader__spinner { animation-duration: 2.4s !important; }
+  .mini-loader__spinner { animation-duration: 2.0s !important; }
 }
 
 :focus-visible {
@@ -1933,7 +1933,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   border: 4px solid var(--gray-200);
   border-top-color: var(--orange);
   border-radius: 50%;
-  animation: miniLoaderSpin 2.4s linear infinite;
+  animation: miniLoaderSpin 2.0s linear infinite;
 }
 @keyframes miniLoaderSpin {
   to { transform: rotate(360deg); }
