@@ -279,17 +279,14 @@
         <button class="tab-btn is-active" data-nav-target="dashboard">
           <span class="tab-btn__icon">🏠</span><span>Início</span>
         </button>
+        <button class="tab-btn" data-nav-target="plan">
+          <span class="tab-btn__icon">🎯</span><span>Meu Plano</span>
+        </button>
         <button class="tab-btn" data-nav-target="checkin">
           <span class="tab-btn__icon">✅</span><span>Check-in</span>
         </button>
-        <button class="tab-btn" data-nav-target="history">
-          <span class="tab-btn__icon">📈</span><span>Histórico</span>
-        </button>
-        <button class="tab-btn" data-nav-target="progress">
-          <span class="tab-btn__icon">🔥</span><span>Progresso</span>
-        </button>
         <button class="tab-btn" data-nav-target="guide">
-          <span class="tab-btn__icon">📘</span><span>Guia Completo</span>
+          <span class="tab-btn__icon">📘</span><span>Aprenda o Porquê</span>
         </button>
         <button class="tab-btn" data-nav-target="admin" id="navAdminSidebar" style="display:none;">
           <span class="tab-btn__icon">⚙️</span><span>Admin</span>
@@ -306,242 +303,17 @@
 
         <main class="content">
 
-          <!-- ==================== VIEW: DASHBOARD ==================== -->
+          <!-- ==================== VIEW: DASHBOARD (Início) ==================== -->
           <div id="view-dashboard" class="view is-active">
 
             <!-- Bem-vindo: responde "o que é isto?" em segundos -->
             <div class="card welcome-intro">
               <span class="welcome-intro__greeting" id="dashGreeting">Olá 👋</span>
-              <p class="welcome-intro__motivation">Siga as etapas abaixo e comece sua transformação.</p>
-              <h1 class="welcome-intro__title">Bem-vindo ao Projeto Falso Magro 30 Dias</h1>
+              <p class="welcome-intro__motivation">Acompanhe seu progresso e o que falta fazer hoje.</p>
               <p class="sync-status" id="syncStatus"></p>
             </div>
 
-            <!-- ==================== PROJETO: CABEÇALHO + PROGRESSO ==================== -->
-            <div class="card project-header-card">
-              <div class="project-header-card__title">🔥 PROJETO FALSO MAGRO 30D</div>
-              <div class="project-header-card__day" id="projectDayLabel">Dia 1 de 30</div>
-              <div class="project-progress-bar">
-                <div class="project-progress-bar__fill" id="projectProgressFill" style="width:0%;"></div>
-              </div>
-            </div>
-
-            <!-- ==================== SEU PLANO ==================== -->
-            <h2 class="section-title">🎯 Seu Plano</h2>
-
-            <div class="plan-card">
-              <div class="plan-card__head">
-                <span class="plan-card__icon">🍽️</span>
-                <span class="plan-card__title">Sua alimentação</span>
-              </div>
-              <div class="plan-card__value" id="planDietValue">—</div>
-              <div class="plan-card__macros" id="planDietMacros"></div>
-              <div class="plan-card__actions">
-                <button type="button" class="btn btn--secondary" id="planDietViewBtn">Ver alimentação</button>
-                <button type="button" class="btn btn--ghost" id="planDietChangeBtn">Alterar</button>
-              </div>
-              <div class="plan-card__details" id="planDietDetails" style="display:none;"></div>
-            </div>
-
-            <div class="plan-card">
-              <div class="plan-card__head">
-                <span class="plan-card__icon">🏋️</span>
-                <span class="plan-card__title">Seu treino</span>
-              </div>
-              <div class="plan-card__value" id="planWorkoutValue">—</div>
-              <div class="plan-card__actions">
-                <button type="button" class="btn btn--secondary" id="planWorkoutViewBtn">Ver treino</button>
-                <button type="button" class="btn btn--ghost" id="planWorkoutChangeBtn">Alterar</button>
-              </div>
-              <div class="plan-card__details" id="planWorkoutDetails" style="display:none;"></div>
-            </div>
-
-            <div class="plan-card">
-              <div class="plan-card__head">
-                <span class="plan-card__icon">❤️</span>
-                <span class="plan-card__title">Seu cardio</span>
-              </div>
-              <div class="plan-card__value" id="planCardioValue">—</div>
-              <div class="plan-card__actions">
-                <button type="button" class="btn btn--ghost" id="planCardioChangeBtn">Alterar</button>
-              </div>
-            </div>
-
-            <!-- ==================== HOJE ==================== -->
-            <h2 class="section-title">📋 Hoje</h2>
-
-            <div class="today-status">
-              <div class="today-status__row">
-                <span class="today-status__icon" id="todayCheckinIcon">⭕</span>
-                <div class="today-status__text">
-                  <span class="today-status__label">Check-in de hoje</span>
-                  <span class="today-status__hint" id="todayCheckinHint">Ainda não feito</span>
-                </div>
-                <button type="button" class="btn btn--primary btn--sm" data-nav-target="checkin" id="todayCheckinBtn">Fazer</button>
-              </div>
-
-              <div class="today-status__row">
-                <span class="today-status__icon" id="todayCardioIcon">⭕</span>
-                <div class="today-status__text">
-                  <span class="today-status__label">Cardio</span>
-                  <span class="today-status__hint" id="todayCardioHint">—</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Comece por aqui: os passos -->
-            <h2 class="section-title">Comece por aqui</h2>
-
-            <div id="stepCardGoals" class="step-card">
-              <div class="step-card__head">
-                <span class="step-card__number">1</span>
-                <div class="step-card__title" id="stepTitleGoals">Calcule suas metas</div>
-                <span class="step-card__check" id="stepCheckGoals" style="display:none;">✓</span>
-              </div>
-              <p class="step-card__desc">Informe idade, peso e altura para descobrir quantas calorias e quantos macronutrientes consumir diariamente.</p>
-              <button class="btn btn--primary" id="stepBtnGoals" data-action="open-calculator">Calcular minhas metas</button>
-              <p class="step-card__hint">Leva menos de dois minutos.</p>
-            </div>
-
-            <div class="step-card">
-              <div class="step-card__head">
-                <span class="step-card__number">2</span>
-                <div class="step-card__title">Abra o Guia Completo</div>
-              </div>
-              <p class="step-card__desc">No Guia Completo você encontrará como montar sua alimentação, exemplos de dieta, sugestões de treino e orientações gerais do projeto.</p>
-              <button class="btn btn--secondary" data-nav-target="guide">Abrir Guia Completo</button>
-            </div>
-
-            <div id="stepCardCheckin" class="step-card">
-              <div class="step-card__head">
-                <span class="step-card__number">3</span>
-                <div class="step-card__title" id="stepTitleCheckin">Faça seu check-in diário</div>
-                <span class="step-card__check" id="stepCheckToday" style="display:none;">✓</span>
-              </div>
-              <p class="step-card__desc">Registre diariamente seu peso, água, treino, alimentação e energia para acompanhar sua evolução.</p>
-              <button class="btn btn--primary" id="stepBtnCheckin" data-nav-target="checkin">Fazer Check-in</button>
-              <p class="step-card__hint" id="stepCheckinMeta" style="display:none;"></p>
-            </div>
-
-          </div>
-
-          <!-- ==================== VIEW: CHECK-IN ==================== -->
-          <div id="view-checkin" class="view">
-            <h2 class="section-title" style="margin-top:0;">Como foi o seu dia?</h2>
-
-            <div id="checkinTodayNotice" class="checkin-today-notice" style="display:none;">
-              <span class="checkin-today-notice__icon">✅</span>
-              <span id="checkinTodayNoticeText">Você já fez seu check-in hoje.</span>
-            </div>
-
-            <div class="card">
-              <div class="field">
-                <label class="field__label" for="checkinWeight">⚖️ Peso de hoje (kg)</label>
-                <input id="checkinWeight" class="input" type="number" step="0.1" min="0" placeholder="Ex: 78.4" inputmode="decimal" />
-              </div>
-
-              <div class="field">
-                <label class="field__label" for="checkinWater">💧 Água ingerida (ml)</label>
-                <input id="checkinWater" class="input" type="number" step="50" min="0" placeholder="Ex: 2500" inputmode="numeric" />
-                <p class="field__hint">Se preferir, some copos e garrafas do dia em mililitros.</p>
-              </div>
-
-              <div class="field">
-                <label class="field__label">💪 Treinou hoje?</label>
-                <div class="toggle-row" id="trainedRow" data-toggle-group="trained">
-                  <button type="button" class="toggle-btn" data-value="sim">Sim</button>
-                  <button type="button" class="toggle-btn" data-value="nao">Não</button>
-                </div>
-              </div>
-
-              <div class="field">
-                <label class="field__label">❤️ Fez cardio hoje?</label>
-                <div class="toggle-row" id="didCardioRow" data-toggle-group="didCardio">
-                  <button type="button" class="toggle-btn" data-value="sim">Sim</button>
-                  <button type="button" class="toggle-btn" data-value="nao">Não</button>
-                </div>
-              </div>
-
-              <div class="field">
-                <label class="field__label">😴 Dormiu bem?</label>
-                <div class="toggle-row" id="sleptWellRow" data-toggle-group="sleptWell">
-                  <button type="button" class="toggle-btn" data-value="sim">Sim</button>
-                  <button type="button" class="toggle-btn" data-value="nao">Não</button>
-                </div>
-              </div>
-
-              <div class="field">
-                <label class="field__label">⚡ Nível de energia (1 a 10)</label>
-                <div class="scale-row" id="energyScale">
-                  <button type="button" class="scale-dot" data-value="1">1</button>
-                  <button type="button" class="scale-dot" data-value="2">2</button>
-                  <button type="button" class="scale-dot" data-value="3">3</button>
-                  <button type="button" class="scale-dot" data-value="4">4</button>
-                  <button type="button" class="scale-dot" data-value="5">5</button>
-                  <button type="button" class="scale-dot" data-value="6">6</button>
-                  <button type="button" class="scale-dot" data-value="7">7</button>
-                  <button type="button" class="scale-dot" data-value="8">8</button>
-                  <button type="button" class="scale-dot" data-value="9">9</button>
-                  <button type="button" class="scale-dot" data-value="10">10</button>
-                </div>
-              </div>
-
-              <div class="field">
-                <label class="field__label">🍽️ Como foi sua alimentação hoje?</label>
-                <div class="option-group" id="nutritionOptions">
-                  <button type="button" class="option-chip" data-value="excelente">Excelente</button>
-                  <button type="button" class="option-chip" data-value="boa">Boa</button>
-                  <button type="button" class="option-chip" data-value="regular">Regular</button>
-                  <button type="button" class="option-chip" data-value="ruim">Ruim</button>
-                </div>
-              </div>
-
-              <div class="field" style="margin-bottom:0;">
-                <label class="field__label" for="checkinNotes">📝 Observações (opcional)</label>
-                <textarea id="checkinNotes" class="textarea" placeholder="Como você se sentiu hoje?"></textarea>
-              </div>
-            </div>
-
-            <div style="margin-top:20px;">
-              <button class="btn btn--primary" data-action="save-checkin">Salvar check-in</button>
-            </div>
-          </div>
-
-          <!-- ==================== VIEW: HISTÓRICO ==================== -->
-          <div id="view-history" class="view">
-            <h2 class="section-title" style="margin-top:0;">Último check-in</h2>
-
-            <div id="historyLastWeight" class="card last-checkin-card" style="display:none;">
-              <div class="last-checkin-card__head">
-                <div>
-                  <div class="last-checkin-card__label">Peso registrado</div>
-                  <div id="historyLastWeightValue" class="goal-card__value">—</div>
-                </div>
-                <div id="historyLastWeightDate" class="history-item__tag">—</div>
-              </div>
-              <div class="last-checkin-card__tags" id="historyLastCheckinTags"></div>
-            </div>
-
-            <div id="historyEmpty" class="card empty-state">
-              <div class="empty-state__icon">📋</div>
-              <div class="empty-state__title">Nenhum check-in ainda</div>
-              <div class="empty-state__sub">Seus registros diários vão aparecer aqui assim que você começar.</div>
-              <div style="margin-top:20px;">
-                <button class="btn btn--primary" data-nav-target="checkin">Fazer meu primeiro check-in</button>
-              </div>
-            </div>
-
-            <h2 class="section-title" id="historyListTitle" style="display:none;">Histórico completo</h2>
-
-            <div id="historyListCard" class="card" style="display:none;">
-              <div id="historyList"></div>
-            </div>
-          </div>
-
-          <!-- ==================== VIEW: PROGRESSO ==================== -->
-          <div id="view-progress" class="view">
-            <h2 class="section-title" style="margin-top:0;">Seu progresso</h2>
-
+            <!-- ==================== PROGRESSO (ex-aba Progresso, fundida aqui) ==================== -->
             <div class="card card--dark hero-card">
               <span class="hero-card__eyebrow">🔥 Projeto Falso Magro · 30 Dias</span>
               <p class="hero-card__sub" id="dashDayLabel">Dia 1 de 30</p>
@@ -639,51 +411,202 @@
             <div id="dashRecalcWrap" style="margin-top:16px; display:none;">
               <button class="btn btn--secondary" data-action="open-calculator">Recalcular metas</button>
             </div>
+
+            <!-- ==================== HOJE ==================== -->
+            <h2 class="section-title">📋 Hoje</h2>
+
+            <div class="today-status">
+              <div class="today-status__row">
+                <span class="today-status__icon" id="todayCheckinIcon">⭕</span>
+                <div class="today-status__text">
+                  <span class="today-status__label">Check-in de hoje</span>
+                  <span class="today-status__hint" id="todayCheckinHint">Ainda não feito</span>
+                </div>
+                <button type="button" class="btn btn--primary btn--sm" data-nav-target="checkin" id="todayCheckinBtn">Fazer</button>
+              </div>
+
+              <div class="today-status__row">
+                <span class="today-status__icon" id="todayCardioIcon">⭕</span>
+                <div class="today-status__text">
+                  <span class="today-status__label">Cardio</span>
+                  <span class="today-status__hint" id="todayCardioHint">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ==================== HISTÓRICO (ex-aba Histórico, fundida aqui) ==================== -->
+            <h2 class="section-title">Histórico</h2>
+
+            <div id="historyLastWeight" class="card last-checkin-card" style="display:none;">
+              <div class="last-checkin-card__head">
+                <div>
+                  <div class="last-checkin-card__label">Peso registrado</div>
+                  <div id="historyLastWeightValue" class="goal-card__value">—</div>
+                </div>
+                <div id="historyLastWeightDate" class="history-item__tag">—</div>
+              </div>
+              <div class="last-checkin-card__tags" id="historyLastCheckinTags"></div>
+            </div>
+
+            <div id="historyEmpty" class="card empty-state">
+              <div class="empty-state__icon">📋</div>
+              <div class="empty-state__title">Nenhum check-in ainda</div>
+              <div class="empty-state__sub">Seus registros diários vão aparecer aqui assim que você começar.</div>
+              <div style="margin-top:20px;">
+                <button class="btn btn--primary" data-nav-target="checkin">Fazer meu primeiro check-in</button>
+              </div>
+            </div>
+
+            <h2 class="section-title" id="historyListTitle" style="display:none;">Histórico completo</h2>
+
+            <div id="historyListCard" class="card" style="display:none;">
+              <div id="historyList"></div>
+            </div>
+
           </div>
 
-          <!-- ==================== VIEW: GUIA & ORIENTAÇÕES ==================== -->
+          <!-- ==================== VIEW: MEU PLANO ==================== -->
+          <div id="view-plan" class="view">
+            <h2 class="section-title" style="margin-top:0;">🎯 Seu Plano</h2>
+
+            <div class="plan-card">
+              <div class="plan-card__head">
+                <span class="plan-card__icon">🍽️</span>
+                <span class="plan-card__title">Sua alimentação</span>
+              </div>
+              <div class="plan-card__value" id="planDietValue">—</div>
+              <div class="plan-card__macros" id="planDietMacros"></div>
+              <div class="plan-card__actions">
+                <button type="button" class="btn btn--secondary" id="planDietViewBtn">Ver alimentação</button>
+                <button type="button" class="btn btn--ghost" id="planDietChangeBtn">Alterar</button>
+              </div>
+              <div class="plan-card__details" id="planDietDetails" style="display:none;"></div>
+            </div>
+
+            <div class="plan-card">
+              <div class="plan-card__head">
+                <span class="plan-card__icon">🏋️</span>
+                <span class="plan-card__title">Seu treino</span>
+              </div>
+              <div class="plan-card__value" id="planWorkoutValue">—</div>
+              <div class="plan-card__actions">
+                <button type="button" class="btn btn--secondary" id="planWorkoutViewBtn">Ver treino</button>
+                <button type="button" class="btn btn--ghost" id="planWorkoutChangeBtn">Alterar</button>
+              </div>
+              <div class="plan-card__details" id="planWorkoutDetails" style="display:none;"></div>
+            </div>
+
+            <div class="plan-card">
+              <div class="plan-card__head">
+                <span class="plan-card__icon">❤️</span>
+                <span class="plan-card__title">Seu cardio</span>
+              </div>
+              <div class="plan-card__value" id="planCardioValue">—</div>
+              <div class="plan-card__actions">
+                <button type="button" class="btn btn--ghost" id="planCardioChangeBtn">Alterar</button>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- ==================== VIEW: CHECK-IN ==================== -->
+          <div id="view-checkin" class="view">
+            <h2 class="section-title" style="margin-top:0;">Como foi o seu dia?</h2>
+
+            <div id="checkinTodayNotice" class="checkin-today-notice" style="display:none;">
+              <span class="checkin-today-notice__icon">✅</span>
+              <span id="checkinTodayNoticeText">Você já fez seu check-in hoje.</span>
+            </div>
+
+            <div class="card">
+              <div class="field">
+                <label class="field__label" for="checkinWeight">⚖️ Peso de hoje (kg)</label>
+                <input id="checkinWeight" class="input" type="number" step="0.1" min="0" placeholder="Ex: 78.4" inputmode="decimal" />
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="checkinWater">💧 Água ingerida (ml)</label>
+                <input id="checkinWater" class="input" type="number" step="50" min="0" placeholder="Ex: 2500" inputmode="numeric" />
+                <p class="field__hint">Se preferir, some copos e garrafas do dia em mililitros.</p>
+              </div>
+
+              <div class="field">
+                <label class="field__label">💪 Treinou hoje?</label>
+                <div class="toggle-row" id="trainedRow" data-toggle-group="trained">
+                  <button type="button" class="toggle-btn" data-value="sim">Sim</button>
+                  <button type="button" class="toggle-btn" data-value="nao">Não</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label">❤️ Fez cardio hoje?</label>
+                <div class="toggle-row" id="didCardioRow" data-toggle-group="didCardio">
+                  <button type="button" class="toggle-btn" data-value="sim">Sim</button>
+                  <button type="button" class="toggle-btn" data-value="nao">Não</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label">😴 Dormiu bem?</label>
+                <div class="toggle-row" id="sleptWellRow" data-toggle-group="sleptWell">
+                  <button type="button" class="toggle-btn" data-value="sim">Sim</button>
+                  <button type="button" class="toggle-btn" data-value="nao">Não</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label">⚡ Nível de energia (1 a 10)</label>
+                <div class="scale-row" id="energyScale">
+                  <button type="button" class="scale-dot" data-value="1">1</button>
+                  <button type="button" class="scale-dot" data-value="2">2</button>
+                  <button type="button" class="scale-dot" data-value="3">3</button>
+                  <button type="button" class="scale-dot" data-value="4">4</button>
+                  <button type="button" class="scale-dot" data-value="5">5</button>
+                  <button type="button" class="scale-dot" data-value="6">6</button>
+                  <button type="button" class="scale-dot" data-value="7">7</button>
+                  <button type="button" class="scale-dot" data-value="8">8</button>
+                  <button type="button" class="scale-dot" data-value="9">9</button>
+                  <button type="button" class="scale-dot" data-value="10">10</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label">🍽️ Como foi sua alimentação hoje?</label>
+                <div class="option-group" id="nutritionOptions">
+                  <button type="button" class="option-chip" data-value="excelente">Excelente</button>
+                  <button type="button" class="option-chip" data-value="boa">Boa</button>
+                  <button type="button" class="option-chip" data-value="regular">Regular</button>
+                  <button type="button" class="option-chip" data-value="ruim">Ruim</button>
+                </div>
+              </div>
+
+              <div class="field" style="margin-bottom:0;">
+                <label class="field__label" for="checkinNotes">📝 Observações (opcional)</label>
+                <textarea id="checkinNotes" class="textarea" placeholder="Como você se sentiu hoje?"></textarea>
+              </div>
+            </div>
+
+            <div style="margin-top:20px;">
+              <button class="btn btn--primary" data-action="save-checkin">Salvar check-in</button>
+            </div>
+          </div>
+
+          <!-- ==================== VIEW: GUIA (Aprenda o Porquê) ==================== -->
           <div id="view-guide" class="view">
             <button type="button" class="guide-back-btn" data-nav-target="dashboard">← Voltar ao Início</button>
 
-            <h2 class="section-title" style="margin-top:0;">Guia Completo</h2>
+            <h2 class="section-title" style="margin-top:0;">Aprenda o Porquê</h2>
 
             <div class="card guide-features">
-              <div class="guide-features__title">No Guia Completo você encontrará:</div>
+              <div class="guide-features__title">Aqui você encontra:</div>
               <ul class="guide-features__list">
-                <li>Como montar sua alimentação</li>
+                <li>O que é ser "falso magro"</li>
+                <li>Como funciona a recomposição corporal</li>
                 <li>Como escolher proteínas</li>
                 <li>Como escolher carboidratos</li>
                 <li>Como distribuir refeições</li>
-                <li>Exemplos de dieta</li>
-                <li>Exemplos de treino</li>
                 <li>Dicas para acelerar resultados</li>
               </ul>
-              <h2 class="section-title">Exemplos rápidos</h2>
-
-            <div class="guide-toggle" id="guideContentToggle">
-              <button type="button" class="option-chip is-selected" data-value="dieta">🍽️ Dieta</button>
-              <button type="button" class="option-chip" data-value="treino">💪 Treino</button>
-            </div>
-
-            <div id="guideDietPanel">
-              <div class="guide-toggle" id="guideDietToggle">
-                <button type="button" class="option-chip is-selected" data-value="1">Dia simples</button>
-                <button type="button" class="option-chip" data-value="2">Rotina corrida</button>
-              </div>
-              <div id="guideDietContent"></div>
-            </div>
-
-            <div id="guideTreinoPanel" style="display:none;">
-              <div class="guide-toggle" id="guideTreinoToggle">
-                <button type="button" class="option-chip is-selected" data-value="3x">3x</button>
-                <button type="button" class="option-chip" data-value="4x">4x</button>
-                <button type="button" class="option-chip" data-value="5x">5x</button>
-                <button type="button" class="option-chip" data-value="6x">6x</button>
-                <button type="button" class="option-chip" data-value="casa">Em casa</button>
-                <button type="button" class="option-chip" data-value="cardio">Cardio</button>
-              </div>
-              <div id="guideTreinoContent"></div>
-            </div>
             </div>
 
             <div class="card" style="display:flex; align-items:center; justify-content:space-between; flex-direction:row; gap:16px; margin-top:16px;">
@@ -761,17 +684,14 @@
       <button class="tab-btn is-active" data-nav-target="dashboard">
         <span class="tab-btn__icon">🏠</span><span>Início</span>
       </button>
+      <button class="tab-btn" data-nav-target="plan">
+        <span class="tab-btn__icon">🎯</span><span>Meu Plano</span>
+      </button>
       <button class="tab-btn" data-nav-target="checkin">
         <span class="tab-btn__icon">✅</span><span>Check-in</span>
       </button>
-      <button class="tab-btn" data-nav-target="history">
-        <span class="tab-btn__icon">📈</span><span>Histórico</span>
-      </button>
-      <button class="tab-btn" data-nav-target="progress">
-        <span class="tab-btn__icon">🔥</span><span>Progresso</span>
-      </button>
       <button class="tab-btn" data-nav-target="guide">
-        <span class="tab-btn__icon">📘</span><span>Guia</span>
+        <span class="tab-btn__icon">📘</span><span>Aprenda</span>
       </button>
     </nav>
   </section>
@@ -838,6 +758,7 @@
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/calculator.js"></script>
 <script src="assets/js/dashboard.js"></script>
+<script src="assets/js/plan.js"></script>
 <script src="assets/js/checkin.js"></script>
 <script src="assets/js/progress.js"></script>
 <script src="assets/js/guide-content.js"></script>

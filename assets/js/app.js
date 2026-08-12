@@ -120,12 +120,15 @@ const App = {
       return;
     }
 
+    // [CORREÇÃO] Contas admin não fazem parte do "projeto de 30 dias" e não
+    // devem passar pelo assistente de dieta/treino/cardio — vão direto pro
+    // app, senão perdem acesso ao painel (ex: excluir token).
     if (Auth.isAdmin()) {
       this._enterApp();
       return;
     }
 
-    // [NOVO] Usuário já tem conta, mas ainda não configurou o projeto
+    // Usuário já tem conta, mas ainda não configurou o projeto
     // (novo usuário logo após o nome, ou usuário antigo antes desta atualização).
     if (!Storage.hasProjectConfigured()) {
       Onboarding.start();
@@ -151,10 +154,7 @@ const App = {
   _enterApp() {
     this._showScreen('screenMain');
     this._applyAdminVisibility();
-    this.goToView('dashboard');
-    Dashboard.render();
-    Progress.render();
-    History.render();
+    this.goToView('dashboard'); // já dispara Dashboard/Progress/History.render()
     Checkin.refreshTodayState();
     this.renderSyncStatus();
   },
@@ -360,10 +360,9 @@ const App = {
 
     const headerTitles = {
       dashboard: 'Início',
+      plan: 'Meu Plano',
       checkin: 'Check-in diário',
-      history: 'Histórico',
-      progress: 'Progresso',
-      guide: 'Guia Completo',
+      guide: 'Aprenda o Porquê',
       admin: 'Painel administrativo',
     };
     const headerTitleEl = document.getElementById('appHeaderTitle');
@@ -371,9 +370,11 @@ const App = {
 
     window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
 
-    if (viewName === 'history') History.render();
+    // [ATUALIZADO — Fase 6] Histórico e Progresso agora vivem dentro do
+    // Início (não são mais abas próprias); "Meu Plano" ganhou a sua.
+    if (viewName === 'dashboard') { Dashboard.render(); Progress.render(); History.render(); }
+    if (viewName === 'plan') Plan.render();
     if (viewName === 'checkin') Checkin.refreshTodayState();
-    if (viewName === 'progress') Progress.render();
     if (viewName === 'admin') AdminPanel.onEnter();
     if (viewName === 'guide') GuideContent.render();
   },
