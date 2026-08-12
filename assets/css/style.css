@@ -1066,8 +1066,9 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   backdrop-filter: blur(4px);
   z-index: 90;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
+  padding: var(--space-4);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s var(--ease);
@@ -1079,56 +1080,25 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   background: var(--white);
   width: 100%;
   max-width: 480px;
-  border-radius: 28px 28px 0 0;
+  border-radius: 24px;
   padding: var(--space-5);
   max-height: 86vh;
   overflow-y: auto;
-  transform: translateY(24px);
-  transition: transform 0.3s var(--ease);
+  transform: scale(0.96);
+  opacity: 0;
+  transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
 }
-.modal-overlay.is-visible .modal-sheet { transform: translateY(0); }
+.modal-overlay.is-visible .modal-sheet { transform: scale(1); opacity: 1; }
 
-/* Em telas largas (mesmo breakpoint em que a sidebar aparece), o padrão
-   "bottom sheet" (colado embaixo, cantos retos na base) fica estranho:
-   sobra um vão vazio enorme em cima e, com pouco conteúdo (ex: modal de
-   substituições), o card parece "perdido" lá embaixo da tela. A partir de
-   900px o modal vira um diálogo centralizado de verdade, com os 4 cantos
-   arredondados — o comportamento de bottom sheet continua só no mobile,
-   onde faz sentido (alcance do polegar). */
-@media (min-width: 900px) {
-  .modal-overlay { align-items: center; }
-  .modal-sheet {
-    border-radius: 24px;
-    transform: translateY(0) scale(0.96);
-    opacity: 0;
-    transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
-  }
-  .modal-overlay.is-visible .modal-sheet { transform: translateY(0) scale(1); opacity: 1; }
-  .modal-sheet__handle { display: none; }
-  .modal-sheet__header { margin-top: 0; }
-}
-
-/* Centralizado via position:absolute + translateX(-50%) em vez de margin:
-   auto — imune a qualquer contexto flex/grid que um elemento ancestral
-   venha a ganhar no futuro (margin:auto pode falhar silenciosamente
-   dependendo do modo de layout do pai; isso não falha nunca). */
-.modal-sheet__handle {
-  position: absolute;
-  top: var(--space-2);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 4px;
-  background: var(--gray-200);
-  border-radius: var(--radius-full);
-}
+/* A barrinha (handle) só faz sentido no padrão "bottom sheet" (arrastar pra
+   fechar). Como o modal agora é sempre um diálogo centralizado, ela some. */
+.modal-sheet__handle { display: none; }
+.modal-sheet__header { margin-top: 0; }
 
 .modal-sheet__title { font-family: var(--font-display); font-size: 19px; font-weight: 700; }
 .modal-sheet__sub { font-size: 13px; color: var(--gray-600); margin-top: 4px; }
 
 /* Cabeçalho "título + botão fechar" dos modais (calculadora, substituições).
-   margin-top repõe o respiro que a barrinha (handle) dava quando ainda
-   fazia parte do fluxo normal, agora que ela é position:absolute.
    min-width:0 no bloco de texto permite que ele encolha/quebre linha de
    verdade dentro do flex (o padrão min-width:auto do flexbox impede isso e
    pode empurrar o botão de fechar pra fora da área visível quando o texto
@@ -2117,4 +2087,17 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   font-size: 11px;
   opacity: 0.5;
   margin-left: 2px;
+}
+
+/* [NOVO — item 9] Etiqueta que marca um alimento trocado pelo usuário. */
+.guide-table__swap-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--orange);
+  background: rgba(255,107,0,0.1);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  vertical-align: middle;
 }

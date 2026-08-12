@@ -248,6 +248,12 @@ const DietModels = {
    * substituições cadastradas em FOOD_SUBSTITUTIONS, a linha vira clicável
    * (ícone 🔁) e abre o modal via Substitutions.open(). Alimentos sem
    * substituição cadastrada continuam como uma linha simples, sem ação.
+   *
+   * Se o usuário já tiver trocado esse alimento antes (Storage.getFoodSwap),
+   * a linha mostra o alimento ESCOLHIDO no lugar do original — mas
+   * data-food continua sendo o original, porque é ele que indexa
+   * FOOD_SUBSTITUTIONS (a lista de alternativas é sempre a mesma,
+   * independente de qual delas está ativa agora).
    */
   _renderMealItemRow(item) {
     const subs = FOOD_SUBSTITUTIONS[item.food];
@@ -261,10 +267,14 @@ const DietModels = {
       `;
     }
 
+    const activeSwap = Storage.getFoodSwap(item.food);
+    const displayFood = activeSwap || item.food;
+    const swapNote = activeSwap ? ' <span class="guide-table__swap-tag">trocado</span>' : '';
+
     const subsAttr = JSON.stringify(subs).replace(/"/g, '&quot;');
     return `
       <div class="guide-table__row guide-table__row--clickable" role="button" tabindex="0" data-food="${item.food}" data-subs="${subsAttr}">
-        <span class="guide-table__food">${item.food} <span class="guide-table__sub-icon" title="Ver substituições">🔁</span></span>
+        <span class="guide-table__food">${displayFood}${swapNote} <span class="guide-table__sub-icon" title="Ver substituições">🔁</span></span>
         <span class="guide-table__qty">${item.qty}</span>
       </div>
     `;

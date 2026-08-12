@@ -27,6 +27,13 @@ const Onboarding = {
 
   init() {
     this._bindStepButtons();
+
+    // [NOVO — item 9] Se o usuário trocar um alimento pelo modal de
+    // substituições enquanto um modelo estiver expandido ("Ver modelo")
+    // no Passo 2, essa prévia precisa refletir a troca também.
+    document.addEventListener('foodswap:changed', () => {
+      if (this._active && this._step === 2) this._renderStep2();
+    });
   },
 
   isActive() {

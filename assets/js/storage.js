@@ -176,6 +176,7 @@ const Storage = {
       cardioType: row.cardio_type || null,
       cardioCustomType: row.cardio_custom_type || '',
       projectConfigured: !!row.project_configured,
+      foodSwaps: row.food_swaps || {},
     };
   },
   _userToDb(user) {
@@ -190,6 +191,7 @@ const Storage = {
       cardio_type: user.cardioType || null,
       cardio_custom_type: user.cardioCustomType || null,
       project_configured: !!user.projectConfigured,
+      food_swaps: user.foodSwaps || {},
     };
   },
 
@@ -298,6 +300,31 @@ const Storage = {
     const user = this.getUser() || {};
     const updated = { ...user, ...partial };
     return this.saveUser(updated);
+  },
+
+  /* ---------- Substituições de alimentos (item 9) ---------- */
+  /** Mapa { alimentoOriginal: alimentoEscolhido }. Nunca null — sempre objeto. */
+  getFoodSwaps() {
+    const user = this.getUser();
+    return (user && user.foodSwaps) || {};
+  },
+
+  /** Alimento que deve aparecer no lugar de `originalFood` hoje, se houver troca. */
+  getFoodSwap(originalFood) {
+    return this.getFoodSwaps()[originalFood] || null;
+  },
+
+  async setFoodSwap(originalFood, chosenFood) {
+    const user = this.getUser() || {};
+    const foodSwaps = { ...(user.foodSwaps || {}), [originalFood]: chosenFood };
+    return this.saveUser({ ...user, foodSwaps });
+  },
+
+  async clearFoodSwap(originalFood) {
+    const user = this.getUser() || {};
+    const foodSwaps = { ...(user.foodSwaps || {}) };
+    delete foodSwaps[originalFood];
+    return this.saveUser({ ...user, foodSwaps });
   },
 
   /* ---------- Metas calculadas ---------- */

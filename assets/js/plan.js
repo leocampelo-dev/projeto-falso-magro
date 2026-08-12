@@ -14,6 +14,30 @@ const Plan = {
 
     this._renderPlanCard(user);
     this._bindPlanActions();
+    this._bindFoodSwapRefresh();
+  },
+
+  /**
+   * [NOVO — item 9] Se o usuário trocar um alimento pelo modal de
+   * substituições enquanto "Ver alimentação" estiver aberto aqui, essa
+   * tela precisa se atualizar sozinha pra mostrar a troca — sem isso, ela
+   * ficaria com o HTML antigo (renderizado antes da troca) até a próxima
+   * vez que o botão "Ver alimentação" fosse clicado.
+   */
+  _bindFoodSwapRefresh() {
+    if (document.body.dataset.planFoodswapBound) return;
+    document.body.dataset.planFoodswapBound = 'true';
+
+    document.addEventListener('foodswap:changed', () => {
+      const detailsEl = document.getElementById('planDietDetails');
+      if (!detailsEl || detailsEl.style.display === 'none') return;
+
+      const user = Storage.getUser();
+      if (!user || !user.selectedDiet) return;
+
+      const model = DietModels.get(Number(user.selectedDiet));
+      detailsEl.innerHTML = model ? DietModels.renderHtml(model) : '<p>Modelo não encontrado.</p>';
+    });
   },
 
   _renderPlanCard(user) {
