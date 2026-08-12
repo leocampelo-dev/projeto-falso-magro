@@ -715,12 +715,12 @@
 <div id="calculatorOverlay" class="modal-overlay">
   <div class="modal-sheet">
     <div class="modal-sheet__handle"></div>
-    <div style="display:flex; align-items:flex-start; justify-content:space-between;">
-      <div>
+    <div class="modal-sheet__header">
+      <div class="modal-sheet__header-text">
         <div class="modal-sheet__title">Calculadora de metas</div>
         <div class="modal-sheet__sub">Vamos calcular suas calorias e macros ideais para perder gordura.</div>
       </div>
-      <button id="calculatorCloseBtn" type="button" class="btn--ghost" aria-label="Fechar" style="font-size:20px; padding:6px;">✕</button>
+      <button id="calculatorCloseBtn" type="button" class="btn--ghost modal-sheet__close" aria-label="Fechar">✕</button>
     </div>
 
     <form id="calculatorForm" novalidate>
@@ -769,12 +769,12 @@
 <div id="substitutionOverlay" class="modal-overlay">
   <div class="modal-sheet">
     <div class="modal-sheet__handle"></div>
-    <div style="display:flex; align-items:flex-start; justify-content:space-between;">
-      <div>
+    <div class="modal-sheet__header">
+      <div class="modal-sheet__header-text">
         <div class="modal-sheet__title" id="substitutionTitle">Substituições</div>
         <div class="modal-sheet__sub">Alternativas equivalentes pra esse alimento</div>
       </div>
-      <button id="substitutionCloseBtn" type="button" class="btn--ghost" aria-label="Fechar" style="font-size:20px; padding:6px;">✕</button>
+      <button id="substitutionCloseBtn" type="button" class="btn--ghost modal-sheet__close" aria-label="Fechar">✕</button>
     </div>
 
     <div id="substitutionList" style="margin-top:16px;"></div>

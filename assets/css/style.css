@@ -500,10 +500,13 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
 
 .btn--ghost {
   background: transparent;
+  border: 2px solid var(--gray-200);
   color: var(--gray-600);
+  font-weight: 700;
   width: auto;
   padding: 10px 16px;
 }
+.btn--ghost:active { background: var(--gray-100); }
 
 .btn--dark {
   background: var(--black);
@@ -1072,6 +1075,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
 .modal-overlay.is-visible { opacity: 1; pointer-events: auto; }
 
 .modal-sheet {
+  position: relative;
   background: var(--white);
   width: 100%;
   max-width: 480px;
@@ -1084,16 +1088,45 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
 }
 .modal-overlay.is-visible .modal-sheet { transform: translateY(0); }
 
+/* Centralizado via position:absolute + translateX(-50%) em vez de margin:
+   auto — imune a qualquer contexto flex/grid que um elemento ancestral
+   venha a ganhar no futuro (margin:auto pode falhar silenciosamente
+   dependendo do modo de layout do pai; isso não falha nunca). */
 .modal-sheet__handle {
+  position: absolute;
+  top: var(--space-2);
+  left: 50%;
+  transform: translateX(-50%);
   width: 40px;
   height: 4px;
   background: var(--gray-200);
   border-radius: var(--radius-full);
-  margin: 0 auto var(--space-4);
 }
 
 .modal-sheet__title { font-family: var(--font-display); font-size: 19px; font-weight: 700; }
 .modal-sheet__sub { font-size: 13px; color: var(--gray-600); margin-top: 4px; }
+
+/* Cabeçalho "título + botão fechar" dos modais (calculadora, substituições).
+   margin-top repõe o respiro que a barrinha (handle) dava quando ainda
+   fazia parte do fluxo normal, agora que ela é position:absolute.
+   min-width:0 no bloco de texto permite que ele encolha/quebre linha de
+   verdade dentro do flex (o padrão min-width:auto do flexbox impede isso e
+   pode empurrar o botão de fechar pra fora da área visível quando o texto
+   é mais longo). flex-shrink:0 no botão garante que ele nunca seja
+   espremido/cortado. */
+.modal-sheet__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+.modal-sheet__header-text { min-width: 0; }
+.modal-sheet__close {
+  flex-shrink: 0;
+  font-size: 20px;
+  padding: 6px;
+}
 
 /* ============================================================
    LOADING / SPLASH
@@ -2001,14 +2034,6 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   padding-top: var(--space-4);
   border-top: 1px solid var(--gray-200);
 }
-
-.btn--ghost {
-  background: transparent;
-  border: 2px solid var(--gray-200);
-  color: var(--gray-600);
-  font-weight: 700;
-}
-.btn--ghost:active { background: var(--gray-100); }
 
 /* Card de status "Hoje" (check-in + cardio semanal) */
 .today-status {
