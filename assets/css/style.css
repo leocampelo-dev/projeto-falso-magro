@@ -1088,6 +1088,26 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
 }
 .modal-overlay.is-visible .modal-sheet { transform: translateY(0); }
 
+/* Em telas largas (mesmo breakpoint em que a sidebar aparece), o padrão
+   "bottom sheet" (colado embaixo, cantos retos na base) fica estranho:
+   sobra um vão vazio enorme em cima e, com pouco conteúdo (ex: modal de
+   substituições), o card parece "perdido" lá embaixo da tela. A partir de
+   900px o modal vira um diálogo centralizado de verdade, com os 4 cantos
+   arredondados — o comportamento de bottom sheet continua só no mobile,
+   onde faz sentido (alcance do polegar). */
+@media (min-width: 900px) {
+  .modal-overlay { align-items: center; }
+  .modal-sheet {
+    border-radius: 24px;
+    transform: translateY(0) scale(0.96);
+    opacity: 0;
+    transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
+  }
+  .modal-overlay.is-visible .modal-sheet { transform: translateY(0) scale(1); opacity: 1; }
+  .modal-sheet__handle { display: none; }
+  .modal-sheet__header { margin-top: 0; }
+}
+
 /* Centralizado via position:absolute + translateX(-50%) em vez de margin:
    auto — imune a qualquer contexto flex/grid que um elemento ancestral
    venha a ganhar no futuro (margin:auto pode falhar silenciosamente
