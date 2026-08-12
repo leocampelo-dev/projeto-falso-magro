@@ -2050,3 +2050,26 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
 .today-status__row--done .today-status__label {
   color: var(--gray-600);
 }
+
+/* ============================================================
+   SUBSTITUIÇÕES DE ALIMENTOS (item 9) — linha clicável na lista de refeições
+   ============================================================ */
+.guide-table__row--clickable {
+  cursor: pointer;
+  transition: background 0.15s var(--ease);
+  border-radius: var(--radius-sm);
+}
+.guide-table__row--clickable:hover,
+.guide-table__row--clickable:active {
+  background: var(--gray-100);
+}
+.guide-table__row--clickable:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+
+.guide-table__sub-icon {
+  font-size: 11px;
+  opacity: 0.5;
+  margin-left: 2px;
+}

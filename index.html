@@ -752,6 +752,24 @@
   </div>
 </div>
 
+<!-- ============================================================
+     MODAL: SUBSTITUIÇÕES DE ALIMENTOS
+     ============================================================ -->
+<div id="substitutionOverlay" class="modal-overlay">
+  <div class="modal-sheet">
+    <div class="modal-sheet__handle"></div>
+    <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+      <div>
+        <div class="modal-sheet__title" id="substitutionTitle">Substituições</div>
+        <div class="modal-sheet__sub">Alternativas equivalentes pra esse alimento</div>
+      </div>
+      <button id="substitutionCloseBtn" type="button" class="btn--ghost" aria-label="Fechar" style="font-size:20px; padding:6px;">✕</button>
+    </div>
+
+    <div id="substitutionList" style="margin-top:16px;"></div>
+  </div>
+</div>
+
 <script src="assets/js/supabase-config.js"></script>
 <script src="assets/js/supabase-client.js"></script>
 <script src="assets/js/storage.js"></script>
@@ -765,6 +783,7 @@
 <script src="assets/js/admin.js"></script>
 <script src="assets/js/project-options.js"></script>
 <script src="assets/js/diet-models.js"></script>  
+<script src="assets/js/substitutions.js"></script>
 <script src="assets/js/mini-loader.js"></script> 
 <script src="assets/js/onboarding.js"></script>
 <script src="assets/js/app.js"></script>

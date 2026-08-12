@@ -73,7 +73,8 @@ const App = {
     this._bindAuthScreen();
     this._bindAdminLoginScreen();
     this._bindWelcomeScreen();
-    Onboarding.init(); // [NOVO] assistente de 4 passos
+    Onboarding.init();
+    Substitutions.init(); // [NOVO] modal de substituições de alimentos
     this._bindCalculatorModal();
     this._bindSignOut();
     this._bindConnectivity();

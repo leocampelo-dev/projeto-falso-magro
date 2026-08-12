@@ -14,6 +14,35 @@
  * gramada pra cada indivíduo.
  */
 
+/**
+ * [NOVO — item 9] Substituições específicas por alimento (não por grupo),
+ * usadas pelo modal que abre ao clicar num item da dieta. Fica num mapa só
+ * (por nome do alimento) em vez de repetir a lista dentro de cada refeição
+ * de cada um dos 4 modelos — os mesmos alimentos se repetem entre as dietas
+ * de 1600 a 2200 kcal, então centralizar aqui evita duplicar 4x a mesma
+ * informação. Alimentos sem entrada aqui (ex: "à vontade") não ficam
+ * clicáveis — não faz sentido sugerir substituição pra eles.
+ */
+const FOOD_SUBSTITUTIONS = {
+  'Ovos inteiros mexidos': ['Claras (dobro da quantidade)', 'Omelete com queijo cottage', 'Whey protein + aveia'],
+  'Pão integral': ['Tapioca', 'Aveia em flocos', 'Batata-doce cozida'],
+  'Pasta de amendoim': ['Pasta de amêndoas', 'Abacate amassado', 'Castanhas trituradas'],
+  'Banana': ['Maçã', 'Mamão', 'Manga (porção menor)'],
+  'Frango grelhado': ['Carne magra (patinho/coxão)', 'Peixe branco', 'Ovos (dobro em unidades)', 'Whey protein'],
+  'Arroz branco ou integral': ['Batata-doce', 'Batata inglesa', 'Macarrão', 'Mandioca'],
+  'Feijão': ['Lentilha', 'Grão-de-bico', 'Ervilha'],
+  'Salada crua': ['Legumes no vapor', 'Legumes refogados'],
+  'Azeite': ['Castanhas (1 punhado pequeno)', 'Abacate (1 fatia)'],
+  'Iogurte natural': ['Queijo cottage', 'Whey protein batido com água ou leite'],
+  'Aveia': ['Granola sem açúcar', 'Quinoa em flocos'],
+  'Castanhas': ['Amêndoas', 'Nozes', 'Pasta de amendoim (1 colher)'],
+  'Carne magra ou peixe': ['Frango grelhado', 'Ovos', 'Whey protein'],
+  'Batata-doce': ['Arroz', 'Batata inglesa', 'Mandioca'],
+  'Legumes refogados': ['Salada crua', 'Legumes no vapor'],
+  'Mel': ['Geleia sem açúcar', 'Melado de cana (pequena quantidade)'],
+  'Batata-doce ou arroz': ['Mandioca', 'Macarrão'],
+};
+
 const DietModels = {
   1600: {
     meals: [
@@ -194,12 +223,7 @@ const DietModels = {
     const mealsHtml = model.meals.map((meal) => `
       <div class="onb-meal-block">
         <div class="onb-meal-block__title">${meal.title}</div>
-        ${meal.items.map((item) => `
-          <div class="guide-table__row">
-            <span class="guide-table__food">${item.food}</span>
-            <span class="guide-table__qty">${item.qty}</span>
-          </div>
-        `).join('')}
+        ${meal.items.map((item) => this._renderMealItemRow(item)).join('')}
       </div>
     `).join('');
 
@@ -213,8 +237,35 @@ const DietModels = {
     return `
       ${mealsHtml}
       <div class="onb-meal-block">
-        <div class="onb-meal-block__title">Substituições</div>
+        <div class="onb-meal-block__title">Substituições por grupo</div>
         ${subsHtml}
+      </div>
+    `;
+  },
+
+  /**
+   * [NOVO — item 9] Uma linha de item de refeição. Se o alimento tiver
+   * substituições cadastradas em FOOD_SUBSTITUTIONS, a linha vira clicável
+   * (ícone 🔁) e abre o modal via Substitutions.open(). Alimentos sem
+   * substituição cadastrada continuam como uma linha simples, sem ação.
+   */
+  _renderMealItemRow(item) {
+    const subs = FOOD_SUBSTITUTIONS[item.food];
+
+    if (!subs || !subs.length) {
+      return `
+        <div class="guide-table__row">
+          <span class="guide-table__food">${item.food}</span>
+          <span class="guide-table__qty">${item.qty}</span>
+        </div>
+      `;
+    }
+
+    const subsAttr = JSON.stringify(subs).replace(/"/g, '&quot;');
+    return `
+      <div class="guide-table__row guide-table__row--clickable" role="button" tabindex="0" data-food="${item.food}" data-subs="${subsAttr}">
+        <span class="guide-table__food">${item.food} <span class="guide-table__sub-icon" title="Ver substituições">🔁</span></span>
+        <span class="guide-table__qty">${item.qty}</span>
       </div>
     `;
   },
