@@ -52,6 +52,14 @@ const Plan = {
         cardioValueEl.textContent = 'Não configurado';
       }
     }
+
+    // Água (meta calculada junto com calorias/macros, não é uma "escolha"
+    // do onboarding — por isso o botão é "Recalcular", igual ao da Home,
+    // reaproveitando o data-action="open-calculator" já existente)
+    const waterValueEl = document.getElementById('planWaterValue');
+    if (waterValueEl) {
+      waterValueEl.textContent = goals ? `${(goals.water / 1000).toFixed(1)} L por dia` : 'Calcule suas metas primeiro';
+    }
   },
 
   /** Usa dataset.bound pra não duplicar o listener a cada render(). */
