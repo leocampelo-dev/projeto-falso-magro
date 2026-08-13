@@ -309,9 +309,17 @@ const Storage = {
     return (user && user.foodSwaps) || {};
   },
 
-  /** {food, qty} que deve aparecer no lugar de `originalFood` hoje, se houver troca. */
+  /**
+   * {food, qty} que deve aparecer no lugar de `originalFood` hoje, se
+   * houver troca. Defensivo contra dado salvo ANTES desta versão (quando
+   * a troca era só um texto solto, ex: "Claras (dobro da quantidade)") —
+   * se o valor salvo não tiver o formato {food, qty} esperado, trata como
+   * "sem troca" em vez de quebrar a tela mostrando "undefined".
+   */
   getFoodSwap(originalFood) {
-    return this.getFoodSwaps()[originalFood] || null;
+    const swap = this.getFoodSwaps()[originalFood];
+    if (!swap || typeof swap !== 'object' || !swap.food || !swap.qty) return null;
+    return swap;
   },
 
   /** `chosen` é {food, qty} — a substituição inteira, não só o nome. */
