@@ -146,7 +146,7 @@ const GUIDE_WORKOUTS = {
   cardio: {
     label: 'Cardio',
     level: 'Complemento, não substituto',
-    note: 'Cardio não substitui treino de força. É um complemento pra gerar mais gasto calórico sem depender só da restrição alimentar. Intervalado é opcional, até 1x por semana.',
+    note: 'Cardio não substitui treino de força. É um complemento pra gerar mais gasto calórico sem depender só da restrição alimentar. Intervalado é opcional, até 1x por semana. Prefira fazer depois do treino de musculação (pra não gastar energia que você precisa pro treino principal) ou bem afastado dele — por exemplo, cardio de manhã e treino à noite.',
     stats: [
       ['Frequência', '2 a 4x por semana'],
       ['Duração', '20 a 40 minutos'],

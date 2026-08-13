@@ -33,7 +33,7 @@
  */
 const FOOD_SUBSTITUTIONS = {
   'Ovos inteiros mexidos': [
-    { food: 'Queijo coalho e mussarela', qty: '50g de cada (100g total)' },
+    { food: 'Ovos + queijo coalho ou mussarela', qty: '2 ovos + 50g de queijo' },
     { food: 'Omelete com queijo cottage', qty: '3 ovos + 70g de queijo cottage' },
     { food: 'Whey protein + aveia', qty: '1 dose (30g) whey + 2 colheres de sopa (20g) aveia' },
   ],
@@ -41,6 +41,7 @@ const FOOD_SUBSTITUTIONS = {
     { food: 'Tapioca', qty: '2 colheres de sopa (30g) de goma' },
     { food: 'Aveia em flocos', qty: '3 colheres de sopa (30g)' },
     { food: 'Batata-doce cozida', qty: '1 pedaço médio (80g)' },
+    { food: 'Cuscuz de milho cozido', qty: '115g (≈4 colheres de sopa)' },
   ],
   'Pasta de amendoim': [
     { food: 'Pasta de amêndoas', qty: '1 colher de sopa (16g)' },
@@ -57,7 +58,6 @@ const FOOD_SUBSTITUTIONS = {
   'Frango grelhado': [
     { food: 'Carne magra (patinho/coxão)', qty: '160g' },
     { food: 'Peixe branco', qty: '180g' },
-    { food: 'Ovos + claras', qty: '1 ovo inteiro + 14 claras' },
     { food: 'Whey protein', qty: '70g' },
   ],
   'Arroz branco ou integral': [
@@ -95,7 +95,6 @@ const FOOD_SUBSTITUTIONS = {
   ],
   'Carne magra ou peixe': [
     { food: 'Frango grelhado', qty: '185g' },
-    { food: 'Ovos + claras', qty: '2 ovos inteiros + 12 claras' },
     { food: 'Whey protein', qty: '72g' },
   ],
   'Batata-doce': [
