@@ -89,64 +89,157 @@ const GUIDE_DIETS = {
   },
 };
 
+/**
+ * [REVISADO] Princípios gerais de treino — aparecem uma vez por plano (não
+ * repetidos em cada dia), com técnicas simples de hipertrofia voltadas pra
+ * quem está começando ou é intermediário. Compartilhado entre os planos de
+ * musculação (3x/4x/5x/6x/casa); cardio tem o seu próprio conjunto.
+ */
+const TRAINING_PRINCIPLES = [
+  'Progressão de carga: aumente peso ou repetições a cada 1-2 semanas — é o que faz o músculo crescer com o tempo, não repetir sempre a mesma carga.',
+  'Controle da falha: na maioria das séries, pare 1-2 repetições antes da falha técnica (perder a forma). Vá à falha total só na última série do último exercício de cada grupo muscular.',
+  'Cadência: controle a descida (fase excêntrica) em 2-3 segundos — mais eficiente pra hipertrofia do que descer rápido.',
+  'Aquecimento: faça 1 série leve antes da primeira série "de verdade" em exercícios compostos (supino, agachamento, remada) — não precisa aquecer isolados.',
+];
+
+const CARDIO_PRINCIPLES = [
+  'Progrida aos poucos: aumente a duração ou a intensidade gradualmente a cada semana, não tudo de uma vez.',
+  'Use a respiração como termômetro: se dá pra conversar em frases curtas mas não cantar, a intensidade está certa.',
+  'Prefira a consistência: sessões moderadas regulares valem mais que treinos puxados de vez em quando.',
+];
+
 const GUIDE_WORKOUTS = {
   '3x': {
     label: 'Treino 3x por semana (ABC)',
     level: 'Iniciante / Intermediário',
     note: 'Frequência: A-B-C uma vez por semana, com 1 dia de descanso entre sessões quando possível.',
+    principles: TRAINING_PRINCIPLES,
     days: [
-      { day: 'A', focus: 'Peito / Ombro / Tríceps', exercises: 'Supino reto, Desenvolvimento com halteres, Elevação lateral, Tríceps corda', sets: '3×8-12 (isolado 3×10-15)', rest: '60-90s' },
-      { day: 'B', focus: 'Costas / Bíceps', exercises: 'Puxada frente, Remada baixa, Remada unilateral, Rosca direta', sets: '3×8-12', rest: '60-90s' },
-      { day: 'C', focus: 'Pernas / Abdômen', exercises: 'Agachamento, Leg press, Cadeira extensora, Mesa flexora, Panturrilha, Abdômen', sets: '3×10-12 (panturrilha 3×15)', rest: '60-90s' },
+      { day: 'A', focus: 'Peito / Ombro / Tríceps', exercises: [
+        { name: 'Supino reto (barra ou halteres)', sets: '1 série de aquecimento leve + 3×8-12', rest: '90s' },
+        { name: 'Supino inclinado com halteres', sets: '3×8-12', rest: '90s' },
+        { name: 'Elevação lateral', sets: '3×12-15', rest: '60s', technique: 'Última série: rest-pause' },
+        { name: 'Desenvolvimento com halteres', sets: '3×8-12', rest: '60-90s' },
+        { name: 'Tríceps corda', sets: '3×12-15', rest: '60s', technique: 'Última série: drop-set' },
+      ] },
+      { day: 'B', focus: 'Costas / Bíceps', exercises: [
+        { name: 'Puxada frente', sets: '1 série de aquecimento leve + 3×8-12', rest: '90s' },
+        { name: 'Remada baixa (cabo)', sets: '3×8-12', rest: '90s' },
+        { name: 'Remada unilateral (halter apoiado no banco)', sets: '3×10-12 por lado', rest: '60s' },
+        { name: 'Rosca direta (barra ou halteres)', sets: '3×10-12', rest: '60s', technique: 'Última série: rest-pause' },
+      ] },
+      { day: 'C', focus: 'Pernas / Abdômen', exercises: [
+        { name: 'Agachamento (livre ou com barra)', sets: '1 série de aquecimento leve + 3×10-12', rest: '90s' },
+        { name: 'Leg press', sets: '3×10-12', rest: '90s' },
+        { name: 'Cadeira extensora', sets: '3×12-15', rest: '60s', technique: 'Última série: drop-set' },
+        { name: 'Mesa flexora', sets: '3×12-15', rest: '60s' },
+        { name: 'Panturrilha em pé', sets: '3×15-20', rest: '45s', technique: 'Última série: rest-pause' },
+        { name: 'Abdômen (prancha ou elevação de pernas)', sets: '3×15-20 (ou 30-45s de prancha)', rest: '45s' },
+      ] },
     ],
   },
   '4x': {
     label: 'Treino 4x por semana (ABCD)',
     level: 'Intermediário',
     note: 'Frequência: A-B-C-D, descanso, descanso, ou distribuído conforme sua rotina.',
+    principles: TRAINING_PRINCIPLES,
     days: [
-      { day: 'A', focus: 'Peito / Tríceps', exercises: 'Supino reto, Supino inclinado, Crucifixo/Peck deck, Tríceps testa', sets: '3×8-12', rest: '60-90s' },
-      { day: 'B', focus: 'Costas / Bíceps', exercises: 'Puxada frente, Remada curvada, Remada cabo, Rosca alternada', sets: '3×8-12', rest: '60-90s' },
-      { day: 'C', focus: 'Pernas', exercises: 'Agachamento, Leg press, Cadeira extensora, Mesa flexora, Panturrilha', sets: '3-4×8-12', rest: '90s' },
-      { day: 'D', focus: 'Ombro / Abdômen', exercises: 'Desenvolvimento, Elevação lateral, Elevação posterior, Abdômen (3 variações)', sets: '3×10-15', rest: '60s' },
+      { day: 'A', focus: 'Peito / Tríceps', exercises: [
+        { name: 'Supino reto (barra ou halteres)', sets: '1 série de aquecimento leve + 3×8-12', rest: '90s' },
+        { name: 'Supino inclinado', sets: '3×8-12', rest: '90s' },
+        { name: 'Crucifixo ou peck deck', sets: '3×12-15', rest: '60s' },
+        { name: 'Tríceps testa', sets: '3×10-12', rest: '60s', technique: 'Última série: drop-set' },
+      ] },
+      { day: 'B', focus: 'Costas / Bíceps', exercises: [
+        { name: 'Puxada frente', sets: '1 série de aquecimento leve + 3×8-12', rest: '90s' },
+        { name: 'Remada curvada (barra)', sets: '3×8-12', rest: '90s' },
+        { name: 'Remada cabo (sentado)', sets: '3×10-12', rest: '60s' },
+        { name: 'Rosca alternada', sets: '3×10-12', rest: '60s', technique: 'Última série: rest-pause' },
+      ] },
+      { day: 'C', focus: 'Pernas', exercises: [
+        { name: 'Agachamento (livre ou com barra)', sets: '1 série de aquecimento leve + 4×8-12', rest: '90s' },
+        { name: 'Leg press', sets: '3×10-12', rest: '90s' },
+        { name: 'Cadeira extensora', sets: '3×12-15', rest: '60s' },
+        { name: 'Mesa flexora', sets: '3×12-15', rest: '60s' },
+        { name: 'Panturrilha em pé', sets: '4×15-20', rest: '45s', technique: 'Última série: rest-pause' },
+      ] },
+      { day: 'D', focus: 'Ombro / Abdômen', exercises: [
+        { name: 'Desenvolvimento com halteres', sets: '3×10-12', rest: '60-90s' },
+        { name: 'Elevação lateral', sets: '3×12-15', rest: '60s', technique: 'Última série: drop-set' },
+        { name: 'Elevação posterior (crucifixo invertido)', sets: '3×12-15', rest: '45-60s' },
+        { name: 'Abdômen (3 variações: prancha, elevação de pernas, supra)', sets: '3×15-20 cada', rest: '45s' },
+      ] },
     ],
   },
   '5x': {
     label: 'Treino 5x por semana (ABCDE)',
     level: 'Intermediário / Avançado',
     note: null,
+    principles: TRAINING_PRINCIPLES,
     days: [
-      { day: 'A', focus: 'Peito', exercises: 'Supino reto, Supino inclinado, Crucifixo/Peck deck, Crossover', sets: '3-4×8-12', rest: '60-90s' },
-      { day: 'B', focus: 'Costas', exercises: 'Puxada frente, Remada curvada, Remada cabo, Pull-over', sets: '3-4×8-12', rest: '60-90s' },
-      { day: 'C', focus: 'Pernas', exercises: 'Agachamento, Leg press, Cadeira extensora, Mesa flexora, Panturrilha', sets: '4×8-12', rest: '90s' },
-      { day: 'D', focus: 'Ombro', exercises: 'Desenvolvimento, Elevação lateral, Elevação posterior, Encolhimento', sets: '3×10-15', rest: '60s' },
-      { day: 'E', focus: 'Braços / Abdômen', exercises: 'Rosca direta, Rosca martelo, Tríceps corda, Tríceps testa, Abdômen (3 variações)', sets: '3×10-15', rest: '45-60s' },
+      { day: 'A', focus: 'Peito', exercises: [
+        { name: 'Supino reto (barra ou halteres)', sets: '1 série de aquecimento leve + 4×8-12', rest: '90s' },
+        { name: 'Supino inclinado', sets: '3×8-12', rest: '90s' },
+        { name: 'Crucifixo ou peck deck', sets: '3×12-15', rest: '60s' },
+        { name: 'Crossover (cabo)', sets: '3×12-15', rest: '60s', technique: 'Última série: drop-set' },
+      ] },
+      { day: 'B', focus: 'Costas', exercises: [
+        { name: 'Puxada frente', sets: '1 série de aquecimento leve + 4×8-12', rest: '90s' },
+        { name: 'Remada curvada (barra)', sets: '3×8-12', rest: '90s' },
+        { name: 'Remada cabo (sentado)', sets: '3×10-12', rest: '60s' },
+        { name: 'Pull-over', sets: '3×12-15', rest: '60s' },
+      ] },
+      { day: 'C', focus: 'Pernas', exercises: [
+        { name: 'Agachamento (livre ou com barra)', sets: '1 série de aquecimento leve + 4×8-12', rest: '90s' },
+        { name: 'Leg press', sets: '4×10-12', rest: '90s' },
+        { name: 'Cadeira extensora', sets: '3×12-15', rest: '60s', technique: 'Última série: drop-set' },
+        { name: 'Mesa flexora', sets: '3×12-15', rest: '60s' },
+        { name: 'Panturrilha em pé', sets: '4×15-20', rest: '45s' },
+      ] },
+      { day: 'D', focus: 'Ombro', exercises: [
+        { name: 'Desenvolvimento com halteres', sets: '3×10-12', rest: '60-90s' },
+        { name: 'Elevação lateral', sets: '3×12-15', rest: '60s', technique: 'Última série: rest-pause' },
+        { name: 'Elevação posterior (crucifixo invertido)', sets: '3×12-15', rest: '45-60s' },
+        { name: 'Encolhimento (trapézio)', sets: '3×12-15', rest: '60s' },
+      ] },
+      { day: 'E', focus: 'Braços / Abdômen', exercises: [
+        { name: 'Rosca direta (barra ou halteres)', sets: '3×10-12', rest: '60s' },
+        { name: 'Rosca martelo', sets: '3×10-12', rest: '60s', technique: 'Última série: rest-pause' },
+        { name: 'Tríceps corda', sets: '3×12-15', rest: '45-60s' },
+        { name: 'Tríceps testa', sets: '3×10-12', rest: '45-60s', technique: 'Última série: drop-set' },
+        { name: 'Abdômen (3 variações: prancha, elevação de pernas, supra)', sets: '3×15-20 cada', rest: '45s' },
+      ] },
     ],
   },
   '6x': {
     label: 'Treino 6x por semana (ABC 2x)',
     level: 'Avançado',
     note: 'Mesma divisão do treino 3x, mas o ciclo roda duas vezes na semana: A-B-C-A-B-C, com 1 dia de descanso. Mesmos exercícios e faixas de repetição do plano 3x — a diferença é a frequência de estímulo por grupo muscular (2x por semana em vez de 1x). Indicado só pra quem já tem base de treino e recuperação (sono, alimentação) em dia.',
+    principles: TRAINING_PRINCIPLES,
     days: [],
   },
   casa: {
     label: 'Treino em casa (3x por semana, corpo inteiro)',
     level: 'Completo, sem academia',
     note: 'Se tiver halteres ou elástico, aumente a carga progressivamente. Sem equipamento, aumente repetições ou reduza o descanso pra progredir.',
+    principles: TRAINING_PRINCIPLES,
     days: [
-      { day: '—', focus: 'Corpo inteiro', exercises: 'Agachamento livre (ou com mochila/galão de água)', sets: '4×12-15', rest: '60s' },
-      { day: '—', focus: 'Corpo inteiro', exercises: 'Flexão de braço (ajustável: joelho, inclinada, padrão)', sets: '4× até quase a falha', rest: '60s' },
-      { day: '—', focus: 'Corpo inteiro', exercises: 'Afundo alternado', sets: '3×12 por perna', rest: '60s' },
-      { day: '—', focus: 'Corpo inteiro', exercises: 'Remada com elástico ou toalha na porta', sets: '3×12-15', rest: '60s' },
-      { day: '—', focus: 'Corpo inteiro', exercises: 'Elevação de quadril', sets: '3×15', rest: '45s' },
-      { day: '—', focus: 'Corpo inteiro', exercises: 'Prancha abdominal', sets: '3×30-45s', rest: '45s' },
-      { day: '—', focus: 'Corpo inteiro', exercises: 'Panturrilha em pé', sets: '3×15-20', rest: '30s' },
+      { day: '—', focus: 'Corpo inteiro', exercises: [
+        { name: 'Agachamento livre (ou com mochila/galão de água)', sets: '4×12-15', rest: '60s' },
+        { name: 'Flexão de braço', sets: '4× até quase a falha', rest: '60s', technique: 'Cansou? Passe pra versão mais fácil (joelho) na hora, sem parar — "drop-set mecânico"' },
+        { name: 'Afundo alternado', sets: '3×12 por perna', rest: '60s' },
+        { name: 'Remada com elástico ou toalha na porta', sets: '3×12-15', rest: '60s' },
+        { name: 'Elevação de quadril', sets: '3×15', rest: '45s' },
+        { name: 'Prancha abdominal', sets: '3×30-45s', rest: '45s', technique: 'Aumente o tempo em 5-10s por semana' },
+        { name: 'Panturrilha em pé', sets: '3×15-20', rest: '30s' },
+      ] },
     ],
   },
   cardio: {
     label: 'Cardio',
     level: 'Complemento, não substituto',
     note: 'Cardio não substitui treino de força. É um complemento pra gerar mais gasto calórico sem depender só da restrição alimentar. Intervalado é opcional, até 1x por semana. Prefira fazer depois do treino de musculação (pra não gastar energia que você precisa pro treino principal) ou bem afastado dele — por exemplo, cardio de manhã e treino à noite.',
+    principles: CARDIO_PRINCIPLES,
     stats: [
       ['Frequência', '2 a 4x por semana'],
       ['Duração', '20 a 40 minutos'],
@@ -224,6 +317,12 @@ const GuideContent = {
    * [NOVO] Gera o HTML de um plano de treino a partir da chave (3x/4x/5x/
    * 6x/casa/cardio). Extraído de _renderWorkout pra ser reaproveitado fora
    * do Guia — usado pelo botão "Ver treino" da aba Meu Plano / Home.
+   *
+   * [REVISADO] Cada exercício agora tem sua própria linha com séries,
+   * descanso e (quando cabe) uma técnica simples de hipertrofia — antes
+   * era uma frase só com todos os exercícios do dia juntos. Um card de
+   * "Princípios do treino" aparece uma vez por plano (não repetido em
+   * cada dia).
    */
   renderWorkoutHtml(key) {
     const workout = GUIDE_WORKOUTS[key];
@@ -246,21 +345,32 @@ const GuideContent = {
     }
 
     workout.days.forEach((d) => {
+      const exercisesHtml = d.exercises.map((ex) => `
+        <div class="exercise-item">
+          <div class="exercise-item__top">
+            <span class="exercise-item__name">${ex.name}</span>
+            <span class="exercise-item__sets">${ex.sets}</span>
+          </div>
+          <div class="exercise-item__meta">Descanso: ${ex.rest}</div>
+          ${ex.technique ? `<div class="exercise-item__technique">💡 ${ex.technique}</div>` : ''}
+        </div>
+      `).join('');
+
       html += `<div class="card" style="margin-bottom:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:baseline;">
-          <span style="font-weight:700; font-family:var(--font-display);">${d.day !== '—' ? 'Dia ' + d.day + ' · ' : ''}${d.focus}</span>
-        </div>
-        <p class="field__hint" style="margin:8px 0;">${d.exercises}</p>
-        <div class="guide-table__row" style="border-top:1px solid var(--gray-200); padding-top:8px; margin-top:4px;">
-          <span class="guide-table__food">Séries × reps</span>
-          <span class="guide-table__measure">${d.sets}</span>
-        </div>
-        <div class="guide-table__row">
-          <span class="guide-table__food">Descanso</span>
-          <span class="guide-table__measure">${d.rest}</span>
-        </div>
+        <div style="font-weight:700; font-family:var(--font-display); margin-bottom:4px;">${d.day !== '—' ? 'Dia ' + d.day + ' · ' : ''}${d.focus}</div>
+        ${exercisesHtml}
       </div>`;
     });
+
+    if (workout.principles && workout.principles.length) {
+      const principlesHtml = workout.principles.map((p) => `
+        <div class="notice-list__item"><span class="notice-list__bullet">!</span>${p}</div>
+      `).join('');
+      html += `<div class="card notice-card" style="margin-bottom:12px;">
+        <div class="notice-card__title">💡 Princípios do treino</div>
+        <div class="notice-list">${principlesHtml}</div>
+      </div>`;
+    }
 
     if (workout.note) {
       html += `<div class="notice-card"><div class="notice-list__item">${workout.note}</div></div>`;

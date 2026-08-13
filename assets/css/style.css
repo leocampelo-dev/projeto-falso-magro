@@ -1324,6 +1324,41 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
 }
 .guide-table__row:last-child { border-bottom: none; }
 
+/* [NOVO] Linha de exercício individual (treino) — nome + séries em cima,
+   descanso e técnica (quando houver) numa linha pequena embaixo. */
+.exercise-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+.exercise-item:last-child { border-bottom: none; }
+.exercise-item__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+.exercise-item__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-900);
+}
+.exercise-item__sets {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-700);
+  white-space: nowrap;
+}
+.exercise-item__meta {
+  font-size: 12px;
+  color: var(--gray-600);
+  margin-top: 3px;
+}
+.exercise-item__technique {
+  font-size: 12px;
+  color: var(--orange-dark);
+  margin-top: 3px;
+}
+
 .guide-table__food {
   font-size: 14px;
   font-weight: 600;
