@@ -9,12 +9,12 @@
 <!-- PWA -->
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#0D0D0D" />
-<link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+<link rel="apple-touch-icon" href="assets/icons/bg_.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Falso Magro" />
 
-<link rel="icon" href="assets/icons/icon-192.png" />
+<link rel="icon" href="assets/icons/bg_.png" />
 <link rel="stylesheet" href="assets/css/style.css" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -26,7 +26,9 @@
      SPLASH
      ============================================================ -->
 <div id="splash" class="splash">
-  <div class="splash__logo">🔥</div>
+  <div class="splash__logo">
+    <img src="assets/icons/bg_.png" alt="Falso Magro" class="brand-mark brand-mark--splash" />
+  </div>
 </div>
 
 <div id="app">
@@ -36,7 +38,9 @@
        ============================================================ -->
   <section id="screenAuth" class="screen">
     <div class="auth-screen">
-      <div class="auth-screen__logo">🔥</div>
+      <div class="auth-screen__logo">
+        <img src="assets/icons/bg_.png" alt="Falso Magro" class="brand-mark brand-mark--auth" />
+      </div>
       <h1 class="auth-screen__title" id="authTitle">Digite seu código de acesso</h1>
       <p class="auth-screen__sub" id="authSub">Use o código enviado após sua compra para acessar o Falso Magro 30D.</p>
 
@@ -272,8 +276,10 @@
       <!-- Sidebar (desktop) -->
       <nav class="sidebar">
         <div class="sidebar__brand">
-          <div class="sidebar__brand-icon">🔥</div>
-          <div class="sidebar__brand-text">Falso Magro</div>
+          <div class="sidebar__brand-icon">
+            <img src="assets/icons/bg_.png" alt="Falso Magro" class="brand-mark brand-mark--sidebar" />
+          </div>
+          <div class="sidebar__brand-text">FALSO MAGRO <br>30 dias</div>
         </div>
 
         <button class="tab-btn is-active" data-nav-target="dashboard">
@@ -298,7 +304,9 @@
         <!-- Header mobile -->
         <header class="app-header">
           <span class="app-header__title" id="appHeaderTitle">Início</span>
-          <span style="font-size:18px;">🔥</span>
+          <span class="app-header__logo">
+            <img src="assets/icons/bg_.png" alt="Falso Magro" class="brand-mark brand-mark--header" />
+          </span>
         </header>
 
         <main class="content">

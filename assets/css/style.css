@@ -159,6 +159,20 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   letter-spacing: 0.06em;
 }
 
+.app-header__logo {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.brand-mark--header {
+  width: 100%;
+  height: 100%;
+}
+
 .app-header__back {
   display: flex;
   align-items: center;
@@ -906,17 +920,29 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   text-align: center;
 }
 
+.brand-mark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 18px rgba(255, 142, 0, 0.12));
+  background: transparent;
+}
+
 .auth-screen__logo {
-  width: 64px;
-  height: 64px;
-  border-radius: 20px;
-  background: linear-gradient(155deg, var(--orange), var(--orange-dark));
+  width: 172px;
+  height: 172px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
   margin-bottom: var(--space-5);
-  box-shadow: var(--shadow-orange);
+  background: transparent;
+  border-radius: 0;
+}
+
+.brand-mark--auth {
+  width: 100%;
+  height: 100%;
 }
 
 .auth-screen__title {
@@ -1132,12 +1158,18 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   transition: opacity 0.4s var(--ease);
 }
 .splash__logo {
-  width: 64px; height: 64px;
-  border-radius: 20px;
-  background: linear-gradient(155deg, var(--orange), var(--orange-dark));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 30px;
+  width: 260px;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   animation: pulse 1.4s ease-in-out infinite;
+  background: transparent;
+}
+
+.brand-mark--splash {
+  width: 100%;
+  height: 100%;
 }
 @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.92); opacity: 0.8; } }
 .splash.is-hidden { opacity: 0; pointer-events: none; }
@@ -1172,11 +1204,16 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
     margin-bottom: var(--space-5);
   }
   .sidebar__brand-icon {
-    width: 30px; height: 30px;
-    border-radius: 9px;
-    background: linear-gradient(155deg, var(--orange), var(--orange-dark));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+  }
+  .brand-mark--sidebar {
+    width: 100%;
+    height: 100%;
   }
   .sidebar__brand-text { font-family: var(--font-display); font-weight: 700; font-size: 14px; }
 
