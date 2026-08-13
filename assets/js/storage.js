@@ -303,20 +303,21 @@ const Storage = {
   },
 
   /* ---------- Substituições de alimentos (item 9) ---------- */
-  /** Mapa { alimentoOriginal: alimentoEscolhido }. Nunca null — sempre objeto. */
+  /** Mapa { alimentoOriginal: {food, qty} }. Nunca null — sempre objeto. */
   getFoodSwaps() {
     const user = this.getUser();
     return (user && user.foodSwaps) || {};
   },
 
-  /** Alimento que deve aparecer no lugar de `originalFood` hoje, se houver troca. */
+  /** {food, qty} que deve aparecer no lugar de `originalFood` hoje, se houver troca. */
   getFoodSwap(originalFood) {
     return this.getFoodSwaps()[originalFood] || null;
   },
 
-  async setFoodSwap(originalFood, chosenFood) {
+  /** `chosen` é {food, qty} — a substituição inteira, não só o nome. */
+  async setFoodSwap(originalFood, chosen) {
     const user = this.getUser() || {};
-    const foodSwaps = { ...(user.foodSwaps || {}), [originalFood]: chosenFood };
+    const foodSwaps = { ...(user.foodSwaps || {}), [originalFood]: chosen };
     return this.saveUser({ ...user, foodSwaps });
   },
 

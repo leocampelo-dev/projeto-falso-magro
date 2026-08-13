@@ -22,25 +22,102 @@
  * de 1600 a 2200 kcal, então centralizar aqui evita duplicar 4x a mesma
  * informação. Alimentos sem entrada aqui (ex: "à vontade") não ficam
  * clicáveis — não faz sentido sugerir substituição pra eles.
+ *
+ * Cada substituição tem `food` (nome) e `qty` (quantidade equivalente em
+ * grama + medida caseira, calculada pra bater aproximadamente calorias E
+ * macros com o alimento original — não só o macro principal). A base de
+ * cálculo usada foi a quantidade do alimento original no modelo de 2000
+ * kcal (o "meio-termo" dos 4 planos); como a porção do alimento original
+ * varia um pouco entre os 4 modelos (1600 a 2200 kcal), a equivalência é
+ * uma referência prática pros 4, não uma prescrição exata por plano.
  */
 const FOOD_SUBSTITUTIONS = {
-  'Ovos inteiros mexidos': ['Claras (dobro da quantidade)', 'Omelete com queijo cottage', 'Whey protein + aveia'],
-  'Pão integral': ['Tapioca', 'Aveia em flocos', 'Batata-doce cozida'],
-  'Pasta de amendoim': ['Pasta de amêndoas', 'Abacate amassado', 'Castanhas trituradas'],
-  'Banana': ['Maçã', 'Mamão', 'Manga (porção menor)'],
-  'Frango grelhado': ['Carne magra (patinho/coxão)', 'Peixe branco', 'Ovos (dobro em unidades)', 'Whey protein'],
-  'Arroz branco ou integral': ['Batata-doce', 'Batata inglesa', 'Macarrão', 'Mandioca'],
-  'Feijão': ['Lentilha', 'Grão-de-bico', 'Ervilha'],
-  'Salada crua': ['Legumes no vapor', 'Legumes refogados'],
-  'Azeite': ['Castanhas (1 punhado pequeno)', 'Abacate (1 fatia)'],
-  'Iogurte natural': ['Queijo cottage', 'Whey protein batido com água ou leite'],
-  'Aveia': ['Granola sem açúcar', 'Quinoa em flocos'],
-  'Castanhas': ['Amêndoas', 'Nozes', 'Pasta de amendoim (1 colher)'],
-  'Carne magra ou peixe': ['Frango grelhado', 'Ovos', 'Whey protein'],
-  'Batata-doce': ['Arroz', 'Batata inglesa', 'Mandioca'],
-  'Legumes refogados': ['Salada crua', 'Legumes no vapor'],
-  'Mel': ['Geleia sem açúcar', 'Melado de cana (pequena quantidade)'],
-  'Batata-doce ou arroz': ['Mandioca', 'Macarrão'],
+  'Ovos inteiros mexidos': [
+    { food: 'Queijo coalho e mussarela', qty: '50g de cada (100g total)' },
+    { food: 'Omelete com queijo cottage', qty: '3 ovos + 70g de queijo cottage' },
+    { food: 'Whey protein + aveia', qty: '1 dose (30g) whey + 2 colheres de sopa (20g) aveia' },
+  ],
+  'Pão integral': [
+    { food: 'Tapioca', qty: '2 colheres de sopa (30g) de goma' },
+    { food: 'Aveia em flocos', qty: '3 colheres de sopa (30g)' },
+    { food: 'Batata-doce cozida', qty: '1 pedaço médio (80g)' },
+  ],
+  'Pasta de amendoim': [
+    { food: 'Pasta de amêndoas', qty: '1 colher de sopa (16g)' },
+    { food: 'Abacate amassado', qty: '3 colheres de sopa (50g)' },
+    { food: 'Castanhas trituradas', qty: '2-3 unidades (10g)' },
+    { food: 'Amendoim grão torrado', qty: '17g (≈12-15 grãos)' },
+  ],
+  'Banana': [
+    { food: 'Maçã', qty: '1 unidade média (130g)' },
+    { food: 'Mamão', qty: '1 fatia grande (150g)' },
+    { food: 'Manga', qty: '½ unidade pequena (80g)' },
+    { food: 'Uva', qty: '≈130g (uma taça pequena / 20-24 unidades)' },
+  ],
+  'Frango grelhado': [
+    { food: 'Carne magra (patinho/coxão)', qty: '160g' },
+    { food: 'Peixe branco', qty: '180g' },
+    { food: 'Ovos + claras', qty: '1 ovo inteiro + 14 claras' },
+    { food: 'Whey protein', qty: '70g' },
+  ],
+  'Arroz branco ou integral': [
+    { food: 'Batata-doce', qty: '200g' },
+    { food: 'Batata inglesa', qty: '180g' },
+    { food: 'Macarrão', qty: '120g cozido' },
+    { food: 'Mandioca', qty: '130g' },
+    { food: 'Cuscuz de milho cozido', qty: '170g' },
+  ],
+  'Feijão': [
+    { food: 'Lentilha', qty: '1 concha (90g)' },
+    { food: 'Grão-de-bico', qty: '1 concha (90g)' },
+    { food: 'Ervilha', qty: '1 concha (100g)' },
+  ],
+  'Salada crua': [
+    { food: 'Legumes no vapor', qty: 'à vontade' },
+    { food: 'Legumes refogados', qty: 'à vontade' },
+  ],
+  'Azeite': [
+    { food: 'Castanhas', qty: '1 unidade (5g)' },
+    { food: 'Abacate', qty: '1 fatia fina (15g)' },
+  ],
+  'Iogurte natural': [
+    { food: 'Queijo cottage', qty: '100g (≈4 colheres de sopa)' },
+    { food: 'Whey protein batido', qty: '1 dose (30g) + 200ml água ou leite' },
+  ],
+  'Aveia': [
+    { food: 'Granola sem açúcar', qty: '2 colheres de sopa (25g)' },
+    { food: 'Quinoa em flocos', qty: '3 colheres de sopa (30g)' },
+  ],
+  'Castanhas': [
+    { food: 'Amêndoas', qty: '15 unidades (25g)' },
+    { food: 'Nozes', qty: '5 metades (25g)' },
+    { food: 'Pasta de amendoim', qty: '1 colher de sopa (16g)' },
+  ],
+  'Carne magra ou peixe': [
+    { food: 'Frango grelhado', qty: '185g' },
+    { food: 'Ovos + claras', qty: '2 ovos inteiros + 12 claras' },
+    { food: 'Whey protein', qty: '72g' },
+  ],
+  'Batata-doce': [
+    { food: 'Arroz', qty: '5 colheres de sopa (140g)' },
+    { food: 'Batata inglesa', qty: '180g' },
+    { food: 'Mandioca', qty: '120g' },
+    { food: 'Cuscuz de milho cozido', qty: '125g' },
+    { food: 'Macarrão', qty: '90g cozido' },
+  ],
+  'Legumes refogados': [
+    { food: 'Salada crua', qty: 'à vontade' },
+    { food: 'Legumes no vapor', qty: 'à vontade' },
+  ],
+  'Mel': [
+    { food: 'Geleia sem açúcar', qty: '1 colher de chá (7g)' },
+    { food: 'Melado de cana', qty: '1 colher de chá (7g)' },
+  ],
+  'Batata-doce ou arroz': [
+    { food: 'Mandioca', qty: '150g' },
+    { food: 'Macarrão', qty: '97g cozido' },
+    { food: 'Cuscuz de milho cozido', qty: '137g' },
+  ],
 };
 
 const DietModels = {
@@ -201,12 +278,17 @@ const DietModels = {
     ],
   },
 
-  /** Substituições equivalentes, iguais para os 4 modelos. */
-  substitutions: [
-    { group: 'Proteínas', items: 'Frango ↔ carne magra ↔ peixe ↔ ovos ↔ whey protein' },
-    { group: 'Carboidratos', items: 'Arroz ↔ batata-doce ↔ batata inglesa ↔ macarrão ↔ pão integral' },
-    { group: 'Gorduras', items: 'Azeite ↔ castanhas ↔ pasta de amendoim ↔ abacate' },
-    { group: 'Vegetais', items: 'Livre entre folhas, legumes e verduras — quanto mais colorido, melhor' },
+  /**
+   * [REVISADO — item 9] O card "Substituições por grupo" que existia aqui
+   * (genérico, sem quantidade: "Frango ↔ carne ↔ ovo...") foi removido —
+   * ficou redundante e menos preciso que as substituições específicas por
+   * alimento (clicáveis, com quantidade equivalente) que já aparecem em
+   * cada item de refeição acima. No lugar dele entram as orientações
+   * gerais combinadas com o usuário.
+   */
+  orientations: [
+    'Exclua o consumo de açúcar — use adoçantes como Stevia ou Sucralose.',
+    'Refeição livre: 1x por semana, de forma controlada. Se descontrolar ou virar o dia inteiro, compromete o déficit da semana toda.',
   ],
 
   get(kcal) {
@@ -214,10 +296,10 @@ const DietModels = {
   },
 
   /**
-   * [NOVO — Fase 5] Monta o HTML das refeições + substituições de um modelo,
-   * reaproveitando o mesmo estilo de linha (guide-table__row) do Guia.
-   * Usado pelo onboarding (Passo 2) e pela Home ("Ver alimentação"), pra não
-   * duplicar essa marcação em dois arquivos.
+   * [NOVO — Fase 5] Monta o HTML das refeições + orientações gerais de um
+   * modelo, reaproveitando o mesmo estilo de linha (guide-table__row) do
+   * Guia. Usado pelo onboarding (Passo 2) e pela Home ("Ver alimentação"),
+   * pra não duplicar essa marcação em dois arquivos.
    */
   renderHtml(model) {
     const mealsHtml = model.meals.map((meal) => `
@@ -227,19 +309,16 @@ const DietModels = {
       </div>
     `).join('');
 
-    const subsHtml = this.substitutions.map((s) => `
-      <div class="guide-table__row">
-        <span class="guide-table__food">${s.group}</span>
-        <span class="guide-table__measure">${s.items}</span>
-      </div>
+    const orientationsHtml = this.orientations.map((o) => `
+      <div class="notice-list__item"><span class="notice-list__bullet">!</span>${o}</div>
     `).join('');
 
     return `
-      ${mealsHtml}
-      <div class="onb-meal-block">
-        <div class="onb-meal-block__title">Substituições por grupo</div>
-        ${subsHtml}
+      <div class="card notice-card" style="margin-bottom: var(--space-4);">
+        <div class="notice-card__title">⚠️ Antes de montar seu prato</div>
+        <div class="notice-list">${orientationsHtml}</div>
       </div>
+      ${mealsHtml}
     `;
   },
 
@@ -249,11 +328,11 @@ const DietModels = {
    * (ícone 🔁) e abre o modal via Substitutions.open(). Alimentos sem
    * substituição cadastrada continuam como uma linha simples, sem ação.
    *
-   * Se o usuário já tiver trocado esse alimento antes (Storage.getFoodSwap),
-   * a linha mostra o alimento ESCOLHIDO no lugar do original — mas
-   * data-food continua sendo o original, porque é ele que indexa
-   * FOOD_SUBSTITUTIONS (a lista de alternativas é sempre a mesma,
-   * independente de qual delas está ativa agora).
+   * Se o usuário já tiver trocado esse alimento antes (Storage.getFoodSwap
+   * retorna {food, qty}), a linha mostra o alimento E A QUANTIDADE
+   * escolhidos no lugar do original — mas data-food continua sendo o
+   * original, porque é ele que indexa FOOD_SUBSTITUTIONS (a lista de
+   * alternativas é sempre a mesma, independente de qual delas está ativa).
    */
   _renderMealItemRow(item) {
     const subs = FOOD_SUBSTITUTIONS[item.food];
@@ -268,14 +347,15 @@ const DietModels = {
     }
 
     const activeSwap = Storage.getFoodSwap(item.food);
-    const displayFood = activeSwap || item.food;
+    const displayFood = activeSwap ? activeSwap.food : item.food;
+    const displayQty = activeSwap ? activeSwap.qty : item.qty;
     const swapNote = activeSwap ? ' <span class="guide-table__swap-tag">trocado</span>' : '';
 
     const subsAttr = JSON.stringify(subs).replace(/"/g, '&quot;');
     return `
       <div class="guide-table__row guide-table__row--clickable" role="button" tabindex="0" data-food="${item.food}" data-subs="${subsAttr}">
         <span class="guide-table__food">${displayFood}${swapNote} <span class="guide-table__sub-icon" title="Ver substituições">🔁</span></span>
-        <span class="guide-table__qty">${item.qty}</span>
+        <span class="guide-table__qty">${displayQty}</span>
       </div>
     `;
   },

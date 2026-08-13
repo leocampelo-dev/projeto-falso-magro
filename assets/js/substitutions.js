@@ -35,9 +35,10 @@ const Substitutions = {
 
   _bindItemClicks() {
     document.addEventListener('click', (e) => {
-      const choiceBtn = e.target.closest('[data-swap-choice]');
-      if (choiceBtn) {
-        this._applyChoice(choiceBtn.dataset.swapChoice === '__original__' ? null : choiceBtn.dataset.swapChoice);
+      const choiceRow = e.target.closest('[data-swap-food]');
+      if (choiceRow) {
+        const isReset = choiceRow.dataset.swapFood === '__original__';
+        this._applyChoice(isReset ? null : { food: choiceRow.dataset.swapFood, qty: choiceRow.dataset.swapQty });
         return;
       }
 
@@ -48,6 +49,15 @@ const Substitutions = {
 
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
+
+      const choiceRow = e.target.closest('[data-swap-food]');
+      if (choiceRow) {
+        e.preventDefault();
+        const isReset = choiceRow.dataset.swapFood === '__original__';
+        this._applyChoice(isReset ? null : { food: choiceRow.dataset.swapFood, qty: choiceRow.dataset.swapQty });
+        return;
+      }
+
       const row = e.target.closest('[data-subs]');
       if (!row) return;
       e.preventDefault();
@@ -78,19 +88,26 @@ const Substitutions = {
     titleEl.textContent = food;
 
     if (subs && subs.length) {
-      const optionsHtml = subs.map((s) => `
-        <div class="guide-table__row guide-table__row--clickable" role="button" tabindex="0" data-swap-choice="${s.replace(/"/g, '&quot;')}">
-          <span class="guide-table__food">${s === activeSwap ? '✅ ' : ''}${s}</span>
-        </div>
-      `).join('');
+      const optionsHtml = subs.map((s) => {
+        const isActive = activeSwap && activeSwap.food === s.food;
+        return `
+          <div class="guide-table__row guide-table__row--clickable" role="button" tabindex="0" data-swap-food="${s.food.replace(/"/g, '&quot;')}" data-swap-qty="${s.qty.replace(/"/g, '&quot;')}">
+            <span class="guide-table__food">${isActive ? '✅ ' : ''}${s.food}</span>
+            <span class="guide-table__qty">${s.qty}</span>
+          </div>
+        `;
+      }).join('');
 
       const resetHtml = activeSwap ? `
-        <div class="guide-table__row guide-table__row--clickable" role="button" tabindex="0" data-swap-choice="__original__">
+        <div class="guide-table__row guide-table__row--clickable" role="button" tabindex="0" data-swap-food="__original__">
           <span class="guide-table__food">↺ Usar o alimento original (${food})</span>
         </div>
       ` : '';
 
-      listEl.innerHTML = optionsHtml + resetHtml;
+      listEl.innerHTML = `
+        ${optionsHtml}${resetHtml}
+        <p class="field__hint" style="margin-top:12px;">Quantidade de referência — pode variar um pouco conforme seu plano de calorias.</p>
+      `;
     } else {
       listEl.innerHTML = `<p class="field__hint">Sem substituições específicas cadastradas pra este item.</p>`;
     }
@@ -98,11 +115,11 @@ const Substitutions = {
     overlay.classList.add('is-visible');
   },
 
-  async _applyChoice(chosenFoodOrNull) {
+  async _applyChoice(chosenOrNull) {
     if (!this._currentFood) return;
 
-    if (chosenFoodOrNull) {
-      await Storage.setFoodSwap(this._currentFood, chosenFoodOrNull);
+    if (chosenOrNull) {
+      await Storage.setFoodSwap(this._currentFood, chosenOrNull);
     } else {
       await Storage.clearFoodSwap(this._currentFood);
     }
