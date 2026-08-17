@@ -1,0 +1,8 @@
+{
+  "order_id": "teste-manual-003",
+  "order_status": "refunded",
+  "customer": {
+    "email": "corretorleocampelo@gmail.com",
+    "full_name": "Seu Nome Teste"
+  }
+}
