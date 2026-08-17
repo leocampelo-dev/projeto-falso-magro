@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Entrando...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: system-ui, sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; background:#111; color:#fff; text-align:center; }
+    .msg { padding: 24px; }
+    .err { color: #ff6b6b; }
+  </style>
+</head>
+<body>
+  <div class="msg" id="msg">Liberando seu acesso...</div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    // Mesmas credenciais públicas já usadas no restante do app
+    // (assets/js/supabase-config.js) — é a chave "anon"/"publishable",
+    // protegida por RLS, segura pra expor no frontend.
+    const SUPABASE_URL = "https://aermveqwolvxeilnmuog.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlcm12ZXF3b2x2eGVpbG5tdW9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1ODg5MjYsImV4cCI6MjEwMTE2NDkyNn0.JSY3TOk9womK1SDNFMtVfvCRuanm0UTJ6RiJDkdJK3Y";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const msgEl = document.getElementById("msg");
+
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    if (!token) {
+      msgEl.textContent = "Link inválido ou expirado.";
+      msgEl.classList.add("err");
+    } else {
+      // token_hash (não token+email) — mesmo formato que generateLink()
+      // devolve e que o supabase-client.js do app já usa hoje pro login
+      // por código de acesso. O formato token+email é de outro fluxo do
+      // Supabase (signInWithOtp com código curto) e não funciona aqui.
+      const { error } = await supabase.auth.verifyOtp({
+        token_hash: token,
+        type: "magiclink",
+      });
+
+      if (error) {
+        console.error(error);
+        msgEl.textContent = "Não foi possível entrar. Solicite um novo link.";
+        msgEl.classList.add("err");
+      } else {
+        window.location.href = "/index.html";
+      }
+    }
+  </script>
+</body>
+</html>
