@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Entrar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: system-ui, sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; background:#111; color:#fff; }
+    .card { max-width: 340px; padding: 24px; text-align:center; }
+    h1 { font-size: 20px; margin-bottom: 8px; }
+    p { color:#9aa0a6; font-size: 14px; margin-bottom: 20px; }
+    input { width:100%; padding:12px 14px; border-radius:10px; border:1px solid #333; background:#1c1c1c; color:#fff; font-size:15px; box-sizing:border-box; }
+    button { width:100%; margin-top:12px; padding:14px; background:#fff; color:#111; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; }
+    button:disabled { opacity:.5; cursor:default; }
+    #msg { margin-top:16px; font-size:13px; color:#9aa0a6; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Entrar no Falso Magro</h1>
+    <p>Digite o e-mail usado na compra. Vamos enviar um novo link de acesso.</p>
+    <input type="email" id="email" placeholder="seuemail@exemplo.com" />
+    <button id="sendBtn">Enviar link de acesso</button>
+    <div id="msg"></div>
+  </div>
+
+  <script type="module">
+    // Mesma URL do projeto Supabase — só pra montar o endereço da function.
+    const SUPABASE_URL = "https://aermveqwolvxeilnmuog.supabase.co";
+
+    const emailInput = document.getElementById("email");
+    const sendBtn = document.getElementById("sendBtn");
+    const msgEl = document.getElementById("msg");
+
+    sendBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      if (!email || !email.includes("@")) {
+        msgEl.textContent = "Digite um e-mail válido.";
+        return;
+      }
+
+      sendBtn.disabled = true;
+      msgEl.textContent = "Enviando...";
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/request-login-link`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+        msgEl.textContent = data.message || "Se esse e-mail tiver acesso ativo, enviamos um novo link.";
+      } catch (err) {
+        console.error(err);
+        msgEl.textContent = "Erro ao enviar. Tente novamente em instantes.";
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

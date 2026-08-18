@@ -1,8 +1,17 @@
+
 {
-  "order_id": "teste-manual-005",
-  "order_status": "refunded",
+
+  "order_id": "teste-manual-009",
+
+  "order_status": "paid",
+
   "customer": {
-    "email": "corretorleocampelo@gmail.com",
-    "full_name": "Seu Nome Teste"
+
+    "email": "leocampelonutri@gmail.com",
+
+    "full_name": "Leonardo Campelo"
+
   }
+
 }
+

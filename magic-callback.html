@@ -6,12 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body { font-family: system-ui, sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; background:#111; color:#fff; text-align:center; }
-    .msg { padding: 24px; }
+    .msg { padding: 24px; max-width: 320px; }
     .err { color: #ff6b6b; }
+    .btn { margin-top:18px; padding:14px 32px; background:#fff; color:#111; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; }
+    .btn:disabled { opacity:.5; cursor:default; }
+    .link { display:inline-block; margin-top:16px; color:#9aa0a6; font-size:13px; }
   </style>
 </head>
 <body>
-  <div class="msg" id="msg">Liberando seu acesso...</div>
+  <div class="msg">
+    <div id="text">Toque no botão abaixo para entrar.</div>
+    <button class="btn" id="confirmBtn">Confirmar entrada</button>
+    <div id="retryWrap" style="display:none;">
+      <a class="link" href="/entrar.html">Pedir um novo link de acesso</a>
+    </div>
+  </div>
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -23,31 +32,46 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlcm12ZXF3b2x2eGVpbG5tdW9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1ODg5MjYsImV4cCI6MjEwMTE2NDkyNn0.JSY3TOk9womK1SDNFMtVfvCRuanm0UTJ6RiJDkdJK3Y";
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const msgEl = document.getElementById("msg");
+    const textEl = document.getElementById("text");
+    const btn = document.getElementById("confirmBtn");
+    const retryWrap = document.getElementById("retryWrap");
 
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
 
     if (!token) {
-      msgEl.textContent = "Link inválido ou expirado.";
-      msgEl.classList.add("err");
+      textEl.textContent = "Link inválido ou expirado.";
+      textEl.classList.add("err");
+      btn.style.display = "none";
+      retryWrap.style.display = "block";
     } else {
-      // token_hash (não token+email) — mesmo formato que generateLink()
-      // devolve e que o supabase-client.js do app já usa hoje pro login
-      // por código de acesso. O formato token+email é de outro fluxo do
-      // Supabase (signInWithOtp com código curto) e não funciona aqui.
-      const { error } = await supabase.auth.verifyOtp({
-        token_hash: token,
-        type: "magiclink",
-      });
+      // A verificação só roda quando a pessoa CLICA de verdade — nunca
+      // automaticamente ao abrir a página. Isso evita que scanners de
+      // segurança de e-mail (Gmail/Outlook, que pré-visitam links
+      // automaticamente) consumam o token de uso único antes do cliente
+      // clicar, o que causava "Solicite um novo link" mesmo no primeiro uso.
+      btn.addEventListener("click", async () => {
+        btn.disabled = true;
+        textEl.textContent = "Liberando seu acesso...";
 
-      if (error) {
-        console.error(error);
-        msgEl.textContent = "Não foi possível entrar. Solicite um novo link.";
-        msgEl.classList.add("err");
-      } else {
-        window.location.href = "/index.html";
-      }
+        // token_hash (não token+email) — mesmo formato que generateLink()
+        // devolve e que o supabase-client.js do app já usa hoje pro login
+        // por código de acesso.
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: token,
+          type: "magiclink",
+        });
+
+        if (error) {
+          console.error(error);
+          textEl.textContent = "Não foi possível entrar. O link pode já ter sido usado ou expirado.";
+          textEl.classList.add("err");
+          btn.style.display = "none";
+          retryWrap.style.display = "block";
+        } else {
+          window.location.href = "/index.html";
+        }
+      });
     }
   </script>
 </body>
