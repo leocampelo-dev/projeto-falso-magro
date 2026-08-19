@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/ativar", "destination": "/ativar.html" },
+    { "source": "/entrar", "destination": "/entrar.html" },
     { "source": "/esqueci-senha", "destination": "/esqueci-senha.html" },
     { "source": "/redefinir-senha", "destination": "/redefinir-senha.html" }
   ],
