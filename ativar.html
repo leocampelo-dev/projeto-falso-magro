@@ -44,14 +44,17 @@
     <!-- Sucesso -->
     <div id="stepDone" class="hidden">
       <h1>Acesso ativado! 🎉</h1>
-      <p>Sua conta está pronta. Faça login com o e-mail e a senha que você acabou de criar.</p>
-      <button id="goToLoginBtn">Ir para o login</button>
+      <p id="doneMsg">Sua conta está pronta. Entrando automaticamente...</p>
+      <button id="goToLoginBtn" class="hidden">Ir para o login</button>
     </div>
 
     <div id="msg"></div>
   </div>
 
-  <script type="module">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/supabase-config.js"></script>
+  <script src="/assets/js/supabase-client.js"></script>
+  <script>
     const SUPABASE_URL = "https://aermveqwolvxeilnmuog.supabase.co";
 
     // Polling da race condition: o webhook da Kiwify pode levar alguns
@@ -197,6 +200,20 @@
       stepPassword.classList.add("hidden");
       stepDone.classList.remove("hidden");
       setMsg("");
+
+      // Login automático: a pessoa acabou de digitar essa senha agora
+      // mesmo, então não faz sentido pedir de novo numa tela separada.
+      // Se por algum motivo o login automático falhar, cai no fallback
+      // manual (botão "Ir para o login") em vez de travar a pessoa aqui.
+      const doneMsgEl = document.getElementById("doneMsg");
+      const loginResult = await SupabaseClient.signInWithPassword(confirmedEmail, password);
+
+      if (loginResult.ok) {
+        window.location.href = "/index.html";
+      } else {
+        doneMsgEl.textContent = "Conta criada! Faça login com o e-mail e a senha que você acabou de criar.";
+        goToLoginBtn.classList.remove("hidden");
+      }
     });
 
     goToLoginBtn.addEventListener("click", () => {
