@@ -1,4 +1,7 @@
 {
+  "rewrites": [
+    { "source": "/ativar", "destination": "/ativar.html" }
+  ],
   "headers": [
     {
       "source": "/service-worker.js",
