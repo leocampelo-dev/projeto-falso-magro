@@ -1,16 +1,8 @@
-
 {
-
-  "order_id": "teste-manual-011",
-
+  "order_id": "teste-manual-020",
   "order_status": "paid",
-
   "customer": {
-
-    "email": "leocampelo98@gmail.com",
-
+    "email": "leocampelo98+teste1@gmail.com",
     "full_name": "Leonardo Campelo"
-
   }
-
 }
