@@ -36,6 +36,65 @@ const SupabaseClient = {
     await _client.auth.signOut();
   },
 
+  /**
+   * Login padrão com e-mail + senha. Não depende de nenhuma Edge Function —
+   * o Supabase Auth valida a senha no servidor dele.
+   */
+  async signInWithPassword(email, password) {
+    const { error } = await _client.auth.signInWithPassword({ email, password });
+    if (error) {
+      // Mensagem genérica de propósito: não confirma se o e-mail existe ou
+      // não, só que a combinação e-mail+senha não bateu.
+      return { ok: false, error: 'E-mail ou senha incorretos.' };
+    }
+    return { ok: true };
+  },
+
+  /**
+   * Dispara o e-mail de redefinição de senha via nossa Edge Function
+   * (request-password-reset), que usa Resend — mesmo canal já usado pra
+   * outros e-mails transacionais do projeto. Não usa o e-mail nativo do
+   * Supabase (exigiria SMTP customizado pra ser editável e tem rate limit
+   * baixo por padrão).
+   */
+  async requestPasswordReset(email) {
+    const { data, error } = await _client.functions.invoke('request-password-reset', {
+      body: { email },
+    });
+    if (error) {
+      // Mesmo assim não expomos detalhe nenhum ao usuário.
+      return { ok: true };
+    }
+    return { ok: true, message: data?.message };
+  },
+
+  /** Consome o token_hash do e-mail de redefinição e estabelece sessão temporária */
+  async verifyPasswordRecovery(tokenHash) {
+    const { error } = await _client.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: 'recovery',
+    });
+    if (error) {
+      return { ok: false, error: 'Link inválido ou expirado. Peça uma nova redefinição de senha.' };
+    }
+    return { ok: true };
+  },
+
+  /** Define a nova senha (chamado depois de verifyPasswordRecovery estabelecer sessão) */
+  async updatePassword(newPassword) {
+    const { data, error } = await _client.auth.updateUser({ password: newPassword });
+    if (error || !data?.user) {
+      return { ok: false, error: 'Não foi possível salvar a nova senha. Tente novamente.' };
+    }
+    // Marca password_set_at, cobrindo também quem ainda estava no fluxo
+    // antigo (magic link) e nunca tinha essa coluna preenchida.
+    await _client
+      .from('profiles')
+      .update({ password_set_at: new Date().toISOString() })
+      .eq('id', data.user.id);
+    return { ok: true };
+  },
+
   isSessionAdmin(session) {
     return !!session && session.user?.app_metadata?.role === 'admin';
   },

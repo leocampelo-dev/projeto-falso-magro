@@ -58,6 +58,15 @@ const Auth = {
     Storage.clearAll();
   },
 
+  /** Login padrão do fluxo novo: e-mail + senha */
+  async signInWithPassword(email, password) {
+    const result = await SupabaseClient.signInWithPassword(email, password);
+    if (result.ok) {
+      await this.refreshSession();
+    }
+    return result;
+  },
+
   /**
    * Confirma no servidor se o acesso continua ativo (não foi bloqueado/expirado
    * depois do login). Retorna true se estiver tudo certo, false se o acesso

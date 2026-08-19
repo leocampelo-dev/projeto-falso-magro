@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Redefinir senha</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: system-ui, sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; background:#111; color:#fff; padding: 16px; box-sizing: border-box; }
+    .card { max-width: 340px; width: 100%; padding: 24px; text-align:center; }
+    h1 { font-size: 20px; margin-bottom: 8px; }
+    p { color:#9aa0a6; font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
+    input { width:100%; padding:12px 14px; border-radius:10px; border:1px solid #333; background:#1c1c1c; color:#fff; font-size:15px; box-sizing:border-box; margin-bottom: 10px; }
+    button { width:100%; margin-top:6px; padding:14px; background:#fff; color:#111; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; }
+    button:disabled { opacity:.5; cursor:default; }
+    #msg { margin-top:16px; font-size:13px; color:#9aa0a6; }
+    #msg.error { color: #f87171; }
+    #msg.success { color: #4ade80; }
+    .hidden { display: none; }
+    a { color:#9aa0a6; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="stepConfirm">
+      <h1>Redefinir senha</h1>
+      <p>Toque no botão abaixo para confirmar que é você.</p>
+      <button id="confirmBtn">Confirmar</button>
+    </div>
+
+    <div id="stepPassword" class="hidden">
+      <h1>Crie sua nova senha</h1>
+      <input type="password" id="password" placeholder="Nova senha (mín. 8 caracteres)" />
+      <input type="password" id="passwordConfirm" placeholder="Confirme a nova senha" />
+      <button id="saveBtn">Salvar nova senha</button>
+    </div>
+
+    <div id="stepDone" class="hidden">
+      <h1>Senha atualizada!</h1>
+      <p>Agora é só entrar com sua nova senha.</p>
+      <button id="goToLoginBtn">Ir para o login</button>
+    </div>
+
+    <div id="msg"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/supabase-config.js"></script>
+  <script src="/assets/js/supabase-client.js"></script>
+  <script>
+    const stepConfirm = document.getElementById("stepConfirm");
+    const stepPassword = document.getElementById("stepPassword");
+    const stepDone = document.getElementById("stepDone");
+    const confirmBtn = document.getElementById("confirmBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const passwordInput = document.getElementById("password");
+    const passwordConfirmInput = document.getElementById("passwordConfirm");
+    const goToLoginBtn = document.getElementById("goToLoginBtn");
+    const msgEl = document.getElementById("msg");
+
+    function setMsg(text, type) {
+      msgEl.textContent = text || "";
+      msgEl.className = type || "";
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const tokenHash = params.get("token_hash") || params.get("token");
+
+    if (!tokenHash) {
+      stepConfirm.classList.add("hidden");
+      setMsg("Link inválido ou expirado. Peça uma nova redefinição de senha.", "error");
+    } else {
+      // Confirmação manual (não automática ao carregar a página) — mesmo
+      // motivo do magic-callback.html: evita que scanners de e-mail
+      // consumam o token de uso único antes do clique real da pessoa.
+      confirmBtn.addEventListener("click", async () => {
+        confirmBtn.disabled = true;
+        setMsg("Confirmando...");
+
+        const result = await SupabaseClient.verifyPasswordRecovery(tokenHash);
+
+        if (!result.ok) {
+          setMsg(result.error, "error");
+          confirmBtn.disabled = false;
+          return;
+        }
+
+        stepConfirm.classList.add("hidden");
+        stepPassword.classList.remove("hidden");
+        setMsg("");
+      });
+    }
+
+    saveBtn.addEventListener("click", async () => {
+      const password = passwordInput.value;
+      const passwordConfirm = passwordConfirmInput.value;
+
+      if (password.length < 8) {
+        setMsg("A senha precisa ter pelo menos 8 caracteres.", "error");
+        return;
+      }
+      if (password !== passwordConfirm) {
+        setMsg("As senhas não coincidem.", "error");
+        return;
+      }
+
+      saveBtn.disabled = true;
+      setMsg("Salvando...");
+
+      const result = await SupabaseClient.updatePassword(password);
+
+      saveBtn.disabled = false;
+
+      if (!result.ok) {
+        setMsg(result.error, "error");
+        return;
+      }
+
+      stepPassword.classList.add("hidden");
+      stepDone.classList.remove("hidden");
+      setMsg("");
+    });
+
+    goToLoginBtn.addEventListener("click", () => {
+      window.location.href = "/entrar.html";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Esqueci minha senha</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: system-ui, sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; background:#111; color:#fff; padding: 16px; box-sizing: border-box; }
+    .card { max-width: 340px; width: 100%; padding: 24px; text-align:center; }
+    h1 { font-size: 20px; margin-bottom: 8px; }
+    p { color:#9aa0a6; font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
+    input { width:100%; padding:12px 14px; border-radius:10px; border:1px solid #333; background:#1c1c1c; color:#fff; font-size:15px; box-sizing:border-box; }
+    button { width:100%; margin-top:12px; padding:14px; background:#fff; color:#111; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; }
+    button:disabled { opacity:.5; cursor:default; }
+    #msg { margin-top:16px; font-size:13px; color:#9aa0a6; }
+    #msg.success { color: #4ade80; }
+    a { color:#9aa0a6; font-size: 13px; display:inline-block; margin-top: 18px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Esqueci minha senha</h1>
+    <p>Digite o e-mail da sua conta. Vamos te enviar um link para criar uma nova senha.</p>
+    <input type="email" id="email" placeholder="seuemail@exemplo.com" />
+    <button id="sendBtn">Enviar link de redefinição</button>
+    <div id="msg"></div>
+    <a href="/entrar.html">Voltar para o login</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/supabase-config.js"></script>
+  <script src="/assets/js/supabase-client.js"></script>
+  <script>
+    const emailInput = document.getElementById("email");
+    const sendBtn = document.getElementById("sendBtn");
+    const msgEl = document.getElementById("msg");
+
+    sendBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      if (!email || !email.includes("@")) {
+        msgEl.textContent = "Digite um e-mail válido.";
+        msgEl.className = "";
+        return;
+      }
+
+      sendBtn.disabled = true;
+      msgEl.textContent = "Enviando...";
+      msgEl.className = "";
+
+      await SupabaseClient.requestPasswordReset(email);
+
+      // Mensagem sempre igual, exista ou não conta com esse e-mail —
+      // evita que alguém use esta tela pra descobrir e-mails cadastrados.
+      msgEl.textContent = "Se esse e-mail tiver uma conta ativa, enviamos um link para redefinir a senha.";
+      msgEl.className = "success";
+      sendBtn.disabled = false;
+    });
+  </script>
+</body>
+</html>
