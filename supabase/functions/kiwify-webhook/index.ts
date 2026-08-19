@@ -1,13 +1,12 @@
 // supabase/functions/kiwify-webhook/index.ts
 //
-// Recebe o webhook da Kiwify, registra a compra em `purchases` e mantém
-// `profiles.access_status` sincronizado. NÃO cria senha, NÃO envia magic
-// link e NÃO manda e-mail de login — esta função só registra o estado da
-// compra. Quem cuida da ativação (criação de senha) é a página /ativar,
-// via check-purchase-status + activate-account.
+// Recebe o webhook da Kiwify, cria/localiza o usuário no Supabase Auth pelo
+// e-mail real do comprador, libera 60 dias de acesso e envia um Magic Link
+// por e-mail (via Resend) para o cliente entrar no app sem senha.
 //
-// Segurança: valida um segredo próprio (WEBHOOK_SECRET) que você escolhe
-// e coloca na URL cadastrada no painel da Kiwify:
+// Segurança: em vez de tentar adivinhar o esquema de assinatura interno da
+// Kiwify, a validação usa um segredo próprio (WEBHOOK_SECRET) que você
+// mesmo escolhe e coloca na URL cadastrada no painel da Kiwify:
 //   https://SEU-PROJETO.functions.supabase.co/kiwify-webhook?secret=SEU_SEGREDO
 // Só requisições com o secret correto são processadas.
 
@@ -15,12 +14,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
 
 const ACCESS_DAYS = 60;
-const DEFAULT_PRODUCT_ID = "falso-magro-30d";
 
 // Eventos que liberam acesso (produto aprovado / assinatura renovada)
 const APPROVED_EVENTS = ["compra_aprovada", "order_approved", "paid"];
 // Eventos que bloqueiam acesso sem apagar dados
 const BLOCKED_EVENTS = ["compra_reembolsada", "chargeback", "refunded", "chargedback", "subscription_canceled"];
+
+function siteUrl() {
+  return (Deno.env.get("SITE_URL") ?? "").replace(/\/$/, "");
+}
 
 function extractOrderData(body: any) {
   // A Kiwify pode variar o formato entre payload de webhook e API; cobrimos
@@ -30,17 +32,71 @@ function extractOrderData(body: any) {
     body?.customer?.email ?? body?.Customer?.email ?? body?.email;
   const name: string | undefined =
     body?.customer?.full_name ?? body?.customer?.name ?? body?.Customer?.full_name ?? body?.customer_name;
-  // name é guardado no payload bruto (kiwify_events.payload) para consulta
-  // futura, mas não é usado diretamente aqui — o nome de exibição é
-  // preenchido pelo próprio usuário durante a ativação em /ativar.
   const orderId: string | undefined =
     body?.order_id ?? body?.id ?? body?.order?.id;
   const orderStatus: string | undefined =
     body?.order_status ?? body?.status ?? body?.event ?? body?.webhook_event_type;
-  const productId: string | undefined =
-    body?.product?.id ?? body?.Product?.id ?? body?.product_id;
 
-  return { email, name, orderId, orderStatus, productId };
+  return { email, name, orderId, orderStatus };
+}
+
+async function sendMagicLinkEmail(email: string, name: string | undefined, link: string) {
+  const apiKey = Deno.env.get("RESEND_API_KEY");
+  const from = Deno.env.get("EMAIL_FROM"); // ex: "Falso Magro <acesso@seudominio.com>"
+  if (!apiKey || !from) {
+    console.error("RESEND_API_KEY ou EMAIL_FROM não configurados — e-mail não enviado.");
+    return false;
+  }
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: email,
+      subject: "Seu acesso ao Falso Magro 30 Dias já está liberado 💪",
+      html: `
+      <div style="background:#0d0d0d;padding:32px 16px;font-family:-apple-system,Segoe UI,Roboto,sans-serif;">
+        <div style="max-width:480px;margin:0 auto;background:#161616;border-radius:16px;overflow:hidden;border:1px solid #262626;">
+          <div style="padding:28px 28px 0 28px;text-align:center;">
+            <p style="margin:0;color:#8a8a8a;font-size:12px;letter-spacing:2px;text-transform:uppercase;">Lapidados Clube</p>
+            <h1 style="margin:8px 0 0 0;color:#fff;font-size:22px;">Falso Magro 30 Dias</h1>
+          </div>
+          <div style="padding:20px 28px 8px 28px;">
+            <p style="color:#e5e5e5;font-size:16px;line-height:1.5;">
+              Bem-vindo${name ? `, ${name}` : ""}! 🎉
+            </p>
+            <p style="color:#b3b3b3;font-size:15px;line-height:1.6;">
+              Sua compra foi confirmada e seu acesso já está <strong style="color:#fff;">liberado por 60 dias</strong>.
+              A partir de agora é só entrar e começar seus check-ins diários.
+            </p>
+          </div>
+          <div style="padding:12px 28px 28px 28px;text-align:center;">
+            <a href="${link}" style="display:inline-block;padding:14px 32px;background:#ffffff;color:#0d0d0d;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;">
+              Entrar no app agora
+            </a>
+            <p style="color:#6b6b6b;font-size:12px;margin-top:16px;line-height:1.5;">
+              Se o botão não funcionar, copie e cole este link no navegador:<br>
+              <span style="color:#8a8a8a;word-break:break-all;">${link}</span>
+            </p>
+          </div>
+          <div style="border-top:1px solid #262626;padding:16px 28px;text-align:center;">
+            <p style="color:#5a5a5a;font-size:11px;margin:0;">Falso Magro 30 Dias · um produto Lapidados Clube</p>
+          </div>
+        </div>
+      </div>
+      `,
+    }),
+  });
+
+  if (!res.ok) {
+    console.error("Falha ao enviar e-mail via Resend", await res.text());
+    return false;
+  }
+  return true;
 }
 
 Deno.serve(async (req) => {
@@ -50,7 +106,11 @@ Deno.serve(async (req) => {
 
   const url = new URL(req.url);
   const secret = url.searchParams.get("secret");
+  console.log("DEBUG secret recebido:", secret ? `"${secret}"` : "(vazio)");
+  console.log("DEBUG secret esperado existe?", !!Deno.env.get("WEBHOOK_SECRET"));
+
   if (!secret || secret !== Deno.env.get("WEBHOOK_SECRET")) {
+    console.log("DEBUG => bloqueado: secret não bateu");
     return jsonResponse({ error: "unauthorized" }, 401);
   }
 
@@ -59,26 +119,29 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
+  let rawBody = "";
   let body: any;
   try {
-    body = await req.json();
+    rawBody = await req.text();
+    body = JSON.parse(rawBody);
   } catch {
+    console.log("DEBUG => JSON inválido. Corpo bruto recebido:", rawBody);
     return jsonResponse({ error: "invalid json" }, 400);
   }
 
-  const { email, orderId, orderStatus, productId } = extractOrderData(body);
+  console.log("DEBUG payload recebido:", rawBody);
+
+  const { email, name, orderId, orderStatus } = extractOrderData(body);
+  console.log("DEBUG extraído:", { email, name, orderId, orderStatus });
 
   if (!email || !orderId) {
     console.error("Payload sem email ou orderId", JSON.stringify(body));
     return jsonResponse({ error: "missing email or order id" }, 400);
   }
 
-  const normalizedEmail = email.trim().toLowerCase();
   const eventKey = orderStatus ?? "unknown";
 
-  // Idempotência de log bruto: se este (order_id, event) já foi processado,
-  // não repete o processamento (mas ainda respondemos 200 pra Kiwify não
-  // ficar reenviando).
+  // Idempotência: se este (order_id, event) já foi processado, não repete.
   const { data: already } = await supabaseAdmin
     .from("kiwify_events")
     .select("id")
@@ -96,7 +159,7 @@ Deno.serve(async (req) => {
   if (!isApproval && !isBlock) {
     // Evento que não precisa de ação (ex: boleto_gerado, pix_gerado, carrinho_abandonado).
     await supabaseAdmin.from("kiwify_events").insert({
-      order_id: orderId, event: eventKey, order_status: orderStatus, email: normalizedEmail, payload: body,
+      order_id: orderId, event: eventKey, order_status: orderStatus, email, payload: body,
     });
     return jsonResponse({ ok: true, ignored: true });
   }
@@ -104,63 +167,45 @@ Deno.serve(async (req) => {
   let userId: string | null = null;
 
   if (isApproval) {
-    // Localiza usuário existente pelo e-mail (caso já tenha comprado antes
-    // ou já tenha sido criado por outro fluxo). Não cria usuário no Auth
-    // aqui — quem cria a conta é o fluxo de ativação (/ativar), no momento
-    // em que a pessoa efetivamente define a senha. Antes disso, a compra
-    // fica registrada com user_id nulo e é vinculada pelo e-mail.
-    const { data: existingProfile } = await supabaseAdmin
-      .from("profiles")
-      .select("id")
-      .eq("email", normalizedEmail)
-      .maybeSingle();
+    // generateLink com type "magiclink" cria o usuário automaticamente se
+    // ele ainda não existir — mesmo mecanismo já usado em redeem-access-code.
+    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+      type: "magiclink",
+      email,
+      options: { redirectTo: `${siteUrl()}/magic-callback.html` },
+    });
 
-    userId = existingProfile?.id ?? null;
+    if (linkError || !linkData?.user) {
+      console.error("generateLink falhou", linkError);
+      return jsonResponse({ error: "auth error" }, 500);
+    }
+
+    userId = linkData.user.id;
+    const hashedToken = linkData.properties?.hashed_token;
+    // Só token_hash é necessário — bate com o formato que magic-callback.html usa.
+    const loginLink = `${siteUrl()}/magic-callback.html?token=${encodeURIComponent(hashedToken ?? "")}`;
 
     const expiresAt = new Date(Date.now() + ACCESS_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
-    // Upsert em purchases: unique(kiwify_transaction_id) garante 1 linha
-    // por compra mesmo com reenvios de webhook em outro evento.
-    await supabaseAdmin.from("purchases").upsert(
-      {
-        user_id: userId,
-        email: normalizedEmail,
-        kiwify_transaction_id: String(orderId),
-        product_id: productId ?? DEFAULT_PRODUCT_ID,
-        status: "active",
-        purchased_at: new Date().toISOString(),
-        access_expires_at: expiresAt,
-      },
-      { onConflict: "kiwify_transaction_id" },
-    );
+    await supabaseAdmin.from("profiles").upsert({
+      id: userId,
+      email,
+      name: name ?? undefined,
+      role: "client",
+      access_status: "active",
+      access_expires_at: expiresAt,
+      access_source: "kiwify",
+      kiwify_customer_id: String(orderId),
+    });
 
-    // Se já existe profile (conta já ativada antes, ex: renovação de
-    // compra), atualiza o status. Se não existe ainda, não cria — fica
-    // para /ativar criar no momento da definição de senha.
-    if (userId) {
-      await supabaseAdmin
-        .from("profiles")
-        .update({
-          access_status: "active",
-          access_expires_at: expiresAt,
-          access_source: "kiwify",
-        })
-        .eq("id", userId);
-    }
+    await sendMagicLinkEmail(email, name, loginLink);
   }
 
   if (isBlock) {
-    // Bloqueia a compra correspondente (se existir) e o profile vinculado.
-    await supabaseAdmin
-      .from("purchases")
-      .update({ status: "blocked" })
-      .eq("email", normalizedEmail)
-      .eq("status", "active");
-
     const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("id")
-      .eq("email", normalizedEmail)
+      .eq("email", email)
       .maybeSingle();
 
     if (profile) {
@@ -170,12 +215,12 @@ Deno.serve(async (req) => {
         .update({ access_status: "blocked" })
         .eq("id", profile.id);
     } else {
-      console.error("Reembolso/chargeback para e-mail sem profile encontrado:", normalizedEmail);
+      console.error("Reembolso/chargeback para e-mail sem profile encontrado:", email);
     }
   }
 
   await supabaseAdmin.from("kiwify_events").insert({
-    order_id: orderId, event: eventKey, order_status: orderStatus, email: normalizedEmail, user_id: userId, payload: body,
+    order_id: orderId, event: eventKey, order_status: orderStatus, email, user_id: userId, payload: body,
   });
 
   return jsonResponse({ ok: true });
