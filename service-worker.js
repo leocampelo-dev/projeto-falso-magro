@@ -8,7 +8,7 @@
  * o navegador a buscar os arquivos novos.
  */
 
-const CACHE_NAME = 'falso-magro-v11';
+const CACHE_NAME = 'falso-magro-v12';
 
 const ASSETS_TO_CACHE = [
   './',
