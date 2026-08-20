@@ -671,16 +671,26 @@
           <div id="view-admin" class="view">
             <button type="button" class="guide-back-btn" data-nav-target="dashboard">← Voltar ao Início</button>
 
-            <h2 class="section-title" style="margin-top:0;">Gerar novo código</h2>
+            <h2 class="section-title" style="margin-top:0;">Liberar acesso manual</h2>
             <div class="card">
-              <p style="font-size:13px; color:var(--gray-600); margin-bottom:16px;">Cada código é individual e só pode ser usado por um cliente.</p>
-              <button type="button" class="btn btn--primary" id="adminGenerateBtn">+ Gerar novo código</button>
-
-              <div id="adminGeneratedCard" class="admin-generated-card" style="display:none;">
-                <span class="admin-generated-card__label">Código gerado (mostrado uma única vez):</span>
-                <span class="admin-generated-card__code" id="adminGeneratedCode">—</span>
-                <button type="button" class="btn btn--secondary btn--sm" id="adminCopyBtn">Copiar código</button>
-              </div>
+              <p style="font-size:13px; color:var(--gray-600); margin-bottom:16px;">Use apenas para casos de suporte (ex: cliente comprovou a compra mas teve algum problema técnico). Confirme a compra antes de liberar. O cliente vai usar o e-mail informado aqui em <strong>/ativar</strong> — sem código, sem link especial.</p>
+              <form id="adminGrantForm" novalidate>
+                <input
+                  type="email"
+                  id="adminGrantEmail"
+                  placeholder="e-mail do cliente"
+                  required
+                  style="width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--gray-300, #ccc); margin-bottom:10px; box-sizing:border-box; font-size:15px;"
+                />
+                <input
+                  type="text"
+                  id="adminGrantNotes"
+                  placeholder="Observação (opcional, ex: 'comprovante no WhatsApp 19/08')"
+                  style="width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--gray-300, #ccc); margin-bottom:10px; box-sizing:border-box; font-size:15px;"
+                />
+                <button type="submit" class="btn btn--primary" id="adminGrantBtn">Liberar acesso</button>
+              </form>
+              <div id="adminGrantResult" style="display:none; margin-top:14px; font-size:13px; color:var(--gray-600);"></div>
             </div>
 
             <h2 class="section-title">Clientes</h2>
@@ -688,8 +698,8 @@
               <div id="adminClientsList"></div>
               <div id="adminClientsEmpty" class="empty-state" style="display:none;">
                 <div class="empty-state__icon">👥</div>
-                <div class="empty-state__title">Nenhum cliente ainda</div>
-                <div class="empty-state__sub">Gere o primeiro código acima para começar.</div>
+                <div class="empty-state__title">Nenhum cliente via código (legado)</div>
+                <div class="empty-state__sub">Esta lista mostra apenas o antigo sistema de códigos. Acessos liberados por e-mail (Kiwify ou manual) não aparecem aqui — confira em Authentication → Users no Supabase.</div>
               </div>
               <div id="adminClientsLoading" class="empty-state">
                 <div class="empty-state__sub">Carregando clientes…</div>

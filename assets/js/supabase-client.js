@@ -200,6 +200,19 @@ const SupabaseClient = {
     return data.code;
   },
 
+  /**
+   * Libera acesso manual pra um cliente pelo e-mail real dele — sem gerar
+   * código nenhum. O cliente usa o /ativar de sempre com esse e-mail.
+   * Substitui generateAccessCode como via principal de suporte manual.
+   */
+  async adminGrantAccess(email, notes) {
+    const { data, error } = await _client.functions.invoke('admin-grant-access', {
+      body: { email, notes: notes || null },
+    });
+    if (error || !data || data.error) throw new Error((data && data.error) || 'Falha ao liberar acesso.');
+    return data;
+  },
+
   async adminListClients() {
     const { data, error } = await _client.functions.invoke('admin-clients', {
       body: { action: 'list' },

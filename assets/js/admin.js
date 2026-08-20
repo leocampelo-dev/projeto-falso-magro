@@ -1,15 +1,16 @@
 /**
  * admin.js
- * Painel administrativo simples: gerar códigos de acesso e gerenciar clientes.
+ * Painel administrativo simples: liberar acesso manual por e-mail e
+ * gerenciar clientes existentes (legado, baseado em código).
  * Toda operação privilegiada acontece via Edge Functions (admin-clients,
- * generate-access-code) protegidas por app_metadata.role === "admin" no backend.
+ * admin-grant-access) protegidas por app_metadata.role === "admin" no backend.
  */
 
 const AdminPanel = {
   _loaded: false,
 
   init() {
-    this._bindGenerateButton();
+    this._bindGrantForm();
   },
 
   /** Chamado toda vez que a view admin é aberta */
@@ -17,40 +18,41 @@ const AdminPanel = {
     this._loadClients();
   },
 
-  _bindGenerateButton() {
-    const btn = document.getElementById('adminGenerateBtn');
-    const copyBtn = document.getElementById('adminCopyBtn');
-    if (!btn) return;
+  _bindGrantForm() {
+    const form = document.getElementById('adminGrantForm');
+    if (!form) return;
 
-    btn.addEventListener('click', async () => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const emailInput = document.getElementById('adminGrantEmail');
+      const notesInput = document.getElementById('adminGrantNotes');
+      const btn = document.getElementById('adminGrantBtn');
+      const resultEl = document.getElementById('adminGrantResult');
+
+      const email = emailInput.value.trim();
+      if (!email || !email.includes('@')) {
+        Toast.show('Digite um e-mail válido.', 'error');
+        return;
+      }
+
       btn.disabled = true;
-      btn.textContent = 'Gerando...';
+      btn.textContent = 'Liberando...';
 
       try {
-        const code = await SupabaseClient.generateAccessCode();
-        document.getElementById('adminGeneratedCode').textContent = code;
-        document.getElementById('adminGeneratedCard').style.display = 'flex';
-        Toast.show('Código gerado com sucesso!', 'success');
-        this._loadClients();
+        const result = await SupabaseClient.adminGrantAccess(email, notesInput.value.trim());
+        resultEl.style.display = 'block';
+        resultEl.textContent = `Acesso liberado para ${result.email}. Peça pra ele(a) acessar /ativar com esse e-mail.`;
+        Toast.show('Acesso liberado com sucesso!', 'success');
+        emailInput.value = '';
+        notesInput.value = '';
       } catch (err) {
-        Toast.show(err.message || 'Não foi possível gerar o código.', 'error');
+        Toast.show(err.message || 'Não foi possível liberar o acesso.', 'error');
       } finally {
         btn.disabled = false;
-        btn.textContent = '+ Gerar novo código';
+        btn.textContent = 'Liberar acesso';
       }
     });
-
-    if (copyBtn) {
-      copyBtn.addEventListener('click', async () => {
-        const code = document.getElementById('adminGeneratedCode').textContent;
-        try {
-          await navigator.clipboard.writeText(code);
-          Toast.show('Código copiado!', 'success');
-        } catch (err) {
-          Toast.show('Não foi possível copiar automaticamente. Copie manualmente.', 'error');
-        }
-      });
-    }
   },
 
   async _loadClients() {
