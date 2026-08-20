@@ -102,7 +102,7 @@ const App = {
   async _syncAndEnter() {
     const stillValid = await Auth.isStillValid();
     if (!stillValid) {
-      await this._forceSignOutWithMessage('Seu acesso foi bloqueado ou expirou. Entre em contato com quem vendeu o produto.');
+      await this._forceSignOutWithMessage('Seu acesso foi bloqueado ou expirou.', { showSupport: true });
       return;
     }
 
@@ -140,11 +140,30 @@ const App = {
   },
 
   /** Encerra a sessão e volta para a tela de login, exibindo o motivo */
-  async _forceSignOutWithMessage(message) {
+  // Troque pelo seu número de WhatsApp (formato internacional, só dígitos):
+  // Brasil, DDD 82, número 999999999 → "5582999999999"
+  SUPPORT_WHATSAPP_NUMBER: '5582991729813',
+
+  async _forceSignOutWithMessage(message, options = {}) {
+    const email = Auth.getSession()?.user?.email || '';
     await Auth.signOut();
     this._showScreen('screenAuth');
+
     const errorEl = document.getElementById('authError');
     if (errorEl) errorEl.textContent = message;
+
+    const supportLink = document.getElementById('authSupportLink');
+    if (supportLink) {
+      if (options.showSupport) {
+        const text = email
+          ? `Olá! Meu acesso ao Falso Magro 30 Dias foi bloqueado e preciso de ajuda. Meu e-mail de compra é: ${email}`
+          : `Olá! Meu acesso ao Falso Magro 30 Dias foi bloqueado e preciso de ajuda.`;
+        supportLink.href = `https://wa.me/${this.SUPPORT_WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+        supportLink.style.display = 'block';
+      } else {
+        supportLink.style.display = 'none';
+      }
+    }
   },
 
   _showScreen(id) {
@@ -245,6 +264,8 @@ const App = {
 
     btn.addEventListener('click', async () => {
       await Auth.signOut();
+      const supportLink = document.getElementById('authSupportLink');
+      if (supportLink) supportLink.style.display = 'none';
       this._showScreen('screenAuth');
     });
   },
@@ -304,7 +325,7 @@ const App = {
 
     const stillValid = await Auth.isStillValid();
     if (!stillValid) {
-      await this._forceSignOutWithMessage('Seu acesso foi bloqueado ou expirou. Entre em contato com quem vendeu o produto.');
+      await this._forceSignOutWithMessage('Seu acesso foi bloqueado ou expirou.', { showSupport: true });
       Toast.show('Sua sessão foi encerrada.', 'error');
     }
   },
