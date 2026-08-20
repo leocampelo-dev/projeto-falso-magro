@@ -221,25 +221,25 @@ const SupabaseClient = {
     return data.clients || [];
   },
 
-  async adminSetClientStatus(accessCodeId, action) {
+  async adminSetClientStatus(userId, action) {
     const { data, error } = await _client.functions.invoke('admin-clients', {
-      body: { action, accessCodeId },
+      body: { action, userId },
     });
     if (error || !data || data.error) throw new Error((data && data.error) || 'Falha ao atualizar cliente.');
     return true;
   },
 
-  async adminResetClient(accessCodeId) {
+  async adminResetClient(userId) {
     const { data, error } = await _client.functions.invoke('admin-clients', {
-      body: { action: 'reset', accessCodeId, confirmed: true },
+      body: { action: 'reset', userId, confirmed: true },
     });
     if (error || !data || data.error) throw new Error((data && data.error) || 'Falha ao resetar progresso.');
     return true;
   },
 
-  async adminDeleteClient(accessCodeId) {
+  async adminDeleteClient(userId) {
     const { data, error } = await _client.functions.invoke('admin-clients', {
-      body: { action: 'delete', accessCodeId, confirmed: true },
+      body: { action: 'delete', userId, confirmed: true },
     });
     if (error || !data || data.error) throw new Error((data && data.error) || 'Falha ao excluir cliente.');
     return true;

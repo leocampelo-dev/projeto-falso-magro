@@ -1319,8 +1319,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
   color: var(--gray-600);
   white-space: nowrap;
 }
-.admin-client-row__status--used { background: rgba(31,169,122,0.12); color: var(--success); }
-.admin-client-row__status--active { background: var(--orange-light); color: var(--orange-dark); }
+.admin-client-row__status--active { background: rgba(31,169,122,0.12); color: var(--success); }
+.admin-client-row__status--pending_activation { background: var(--orange-light); color: var(--orange-dark); }
 .admin-client-row__status--blocked { background: rgba(229,72,77,0.12); color: var(--danger); }
 .admin-client-row__status--expired { background: var(--gray-200); color: var(--gray-600); }
 

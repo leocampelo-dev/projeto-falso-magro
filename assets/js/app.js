@@ -175,33 +175,7 @@ const App = {
 
   /* ---------- Tela de código de acesso ---------- */
   _bindAuthScreen() {
-    const form = document.getElementById('authForm');
-    const input = document.getElementById('authCodeInput');
-    const errorEl = document.getElementById('authError');
-    const submitBtn = document.getElementById('authSubmitBtn');
     const adminToggle = document.getElementById('authAdminToggle');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      errorEl.textContent = '';
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Verificando...';
-
-      const result = await Auth.redeemAccessCode(input.value);
-
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Entrar no desafio';
-
-      if (!result.ok) {
-        errorEl.textContent = result.error;
-        input.value = '';
-        input.focus();
-        return;
-      }
-
-      await this._syncAndEnter();
-    });
-
     adminToggle.addEventListener('click', () => this._showScreen('screenAdminLogin'));
   },
 
@@ -271,8 +245,6 @@ const App = {
 
     btn.addEventListener('click', async () => {
       await Auth.signOut();
-      document.getElementById('authCodeInput').value = '';
-      document.getElementById('authError').textContent = '';
       this._showScreen('screenAuth');
     });
   },

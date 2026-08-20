@@ -3,7 +3,13 @@
 // Ações administrativas sobre clientes. Só pode ser chamada por um
 // usuário autenticado com app_metadata.role === "admin".
 //
-// Body esperado: { action: "list" | "block" | "reactivate" | "reset" | "delete", ... }
+// [REVISADO] A lista e as ações passam a ser baseadas em profiles/purchases
+// (fonte de verdade real de acesso hoje — Kiwify ou liberação manual), em
+// vez de access_codes (sistema antigo, hoje sem uso pra clientes novos).
+// Todas as ações agora são chaveadas por userId (profiles.id), não mais
+// por accessCodeId.
+//
+// Body esperado: { action: "list" | "block" | "reactivate" | "reset" | "delete", userId?, confirmed? }
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
@@ -29,116 +35,122 @@ Deno.serve(async (req) => {
     const action = body?.action;
 
     if (action === "list") {
-      const { data: codes, error } = await supabaseAdmin
-        .from("access_codes")
-        .select("id, code_display_prefix, code_display_suffix, status, user_id, created_at, last_used_at")
+      const { data: profiles, error } = await supabaseAdmin
+        .from("profiles")
+        .select("id, email, name, role, access_status, access_source, access_expires_at, password_set_at, created_at")
+        .neq("role", "admin")
         .order("created_at", { ascending: false });
 
       if (error) return jsonResponse({ error: "Não foi possível listar clientes." }, 500);
 
-      const userIds = (codes || []).map((c) => c.user_id).filter(Boolean) as string[];
-      let profilesById: Record<string, { name: string | null }> = {};
+      const emails = (profiles || []).map((p) => p.email).filter(Boolean) as string[];
+      let purchaseByEmail: Record<string, { kiwify_transaction_id: string; purchased_at: string }> = {};
 
-      if (userIds.length) {
-        const { data: profiles } = await supabaseAdmin
-          .from("profiles")
-          .select("id, name")
-          .in("id", userIds);
-        profilesById = Object.fromEntries((profiles || []).map((p) => [p.id, { name: p.name }]));
+      if (emails.length) {
+        const { data: purchases } = await supabaseAdmin
+          .from("purchases")
+          .select("email, kiwify_transaction_id, purchased_at")
+          .in("email", emails)
+          .order("purchased_at", { ascending: false });
+        // Mantém só a compra mais recente por e-mail (primeira que aparecer, já que veio ordenado desc).
+        for (const p of purchases || []) {
+          if (!purchaseByEmail[p.email]) purchaseByEmail[p.email] = p;
+        }
       }
 
-      const clients = (codes || []).map((c) => ({
-        accessCodeId: c.id,
-        maskedCode: `${c.code_display_prefix}-****-${c.code_display_suffix}`,
-        name: c.user_id ? profilesById[c.user_id]?.name || "(sem nome ainda)" : "—",
-        status: c.status,
-        createdAt: c.created_at,
-        lastUsedAt: c.last_used_at,
-      }));
+      const now = Date.now();
+      const clients = (profiles || []).map((p) => {
+        const purchase = p.email ? purchaseByEmail[p.email] : undefined;
+        const isExpired = p.access_expires_at && new Date(p.access_expires_at).getTime() < now;
+
+        let status: string = p.access_status || "unknown";
+        if (isExpired && status === "active") status = "expired";
+        // Compra registrada mas conta nunca ativada (raro: liberação manual
+        // ou compra Kiwify sem a pessoa nunca ter passado por /ativar).
+        if (status === "active" && !p.password_set_at) status = "pending_activation";
+
+        return {
+          userId: p.id,
+          email: p.email,
+          name: p.name || "(sem nome ainda)",
+          status,
+          source: purchase?.kiwify_transaction_id?.startsWith("manual-") ? "manual" : (p.access_source || "—"),
+          createdAt: p.created_at,
+          purchasedAt: purchase?.purchased_at || null,
+          activated: !!p.password_set_at,
+        };
+      });
 
       return jsonResponse({ clients });
     }
 
     if (action === "block" || action === "reactivate") {
-      const accessCodeId = body?.accessCodeId;
-      if (!accessCodeId) return jsonResponse({ error: "accessCodeId é obrigatório." }, 400);
+      const userId = body?.userId;
+      if (!userId) return jsonResponse({ error: "userId é obrigatório." }, 400);
 
-      const newStatus = action === "block" ? "blocked" : "used";
+      const { data: profile } = await supabaseAdmin
+        .from("profiles")
+        .select("email")
+        .eq("id", userId)
+        .maybeSingle();
+      if (!profile) return jsonResponse({ error: "Cliente não encontrado." }, 404);
+
+      const newStatus = action === "block" ? "blocked" : "active";
       const { error } = await supabaseAdmin
-        .from("access_codes")
-        .update({ status: newStatus })
-        .eq("id", accessCodeId);
-
+        .from("profiles")
+        .update({ access_status: newStatus })
+        .eq("id", userId);
       if (error) return jsonResponse({ error: "Não foi possível atualizar o status." }, 500);
+
+      // Mantém purchases em sincronia, mesma lógica do webhook de reembolso.
+      if (profile.email) {
+        const fromStatus = action === "block" ? "active" : "blocked";
+        await supabaseAdmin
+          .from("purchases")
+          .update({ status: newStatus })
+          .eq("email", profile.email)
+          .eq("status", fromStatus);
+      }
+
       return jsonResponse({ ok: true });
     }
 
     if (action === "reset") {
-      const accessCodeId = body?.accessCodeId;
+      const userId = body?.userId;
       const confirmed = body?.confirmed === true;
 
-      if (!accessCodeId) return jsonResponse({ error: "accessCodeId é obrigatório." }, 400);
+      if (!userId) return jsonResponse({ error: "userId é obrigatório." }, 400);
       if (!confirmed) {
         return jsonResponse({ error: "É necessário confirmar explicitamente o reset (confirmed: true)." }, 400);
       }
 
-      const { data: accessCode } = await supabaseAdmin
-        .from("access_codes")
-        .select("user_id")
-        .eq("id", accessCodeId)
-        .maybeSingle();
-
-      if (!accessCode?.user_id) {
-        return jsonResponse({ error: "Cliente ainda não iniciou o uso do código." }, 400);
-      }
-
-      await supabaseAdmin.from("checkins").delete().eq("user_id", accessCode.user_id);
-      await supabaseAdmin.from("goals").delete().eq("user_id", accessCode.user_id);
+      await supabaseAdmin.from("checkins").delete().eq("user_id", userId);
+      await supabaseAdmin.from("goals").delete().eq("user_id", userId);
       await supabaseAdmin
         .from("profiles")
         .update({ start_date: new Date().toISOString().slice(0, 10), completion_shown: false })
-        .eq("id", accessCode.user_id);
+        .eq("id", userId);
 
       return jsonResponse({ ok: true });
     }
 
     if (action === "delete") {
-      const accessCodeId = body?.accessCodeId;
+      const userId = body?.userId;
       const confirmed = body?.confirmed === true;
 
-      if (!accessCodeId) return jsonResponse({ error: "accessCodeId é obrigatório." }, 400);
+      if (!userId) return jsonResponse({ error: "userId é obrigatório." }, 400);
       if (!confirmed) {
         return jsonResponse({ error: "É necessário confirmar explicitamente a exclusão (confirmed: true)." }, 400);
       }
 
-      const { data: accessCode } = await supabaseAdmin
-        .from("access_codes")
-        .select("user_id")
-        .eq("id", accessCodeId)
-        .maybeSingle();
-
-      if (!accessCode) {
-        return jsonResponse({ error: "Código não encontrado." }, 404);
-      }
-
       // Apagar o usuário do Auth já apaga em cascata profile, goals e checkins
-      // (todos referenciam auth.users(id) com "on delete cascade").
-      if (accessCode.user_id) {
-        const { error: deleteUserError } = await supabaseAdmin.auth.admin.deleteUser(accessCode.user_id);
-        if (deleteUserError) {
-          console.error("delete user failed", deleteUserError);
-          return jsonResponse({ error: "Não foi possível excluir os dados do cliente." }, 500);
-        }
-      }
-
-      const { error: deleteCodeError } = await supabaseAdmin
-        .from("access_codes")
-        .delete()
-        .eq("id", accessCodeId);
-
-      if (deleteCodeError) {
-        console.error("delete access_code failed", deleteCodeError);
-        return jsonResponse({ error: "Cliente removido, mas houve falha ao excluir o código." }, 500);
+      // (todos referenciam auth.users(id) com "on delete cascade"). O
+      // histórico de compra em `purchases` é mantido de propósito (auditoria
+      // financeira), mesmo depois da conta de acesso ser removida.
+      const { error: deleteUserError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+      if (deleteUserError) {
+        console.error("delete user failed", deleteUserError);
+        return jsonResponse({ error: "Não foi possível excluir os dados do cliente." }, 500);
       }
 
       return jsonResponse({ ok: true });
